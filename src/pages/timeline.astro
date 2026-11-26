@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { TIMELINE_EPOCHS } from '../data/timeline';
+---
+
+<BaseLayout
+  title="八千年时间线"
+  activeNav="/timeline/"
+  backdrop="/images/route-05-pavilion.jpg"
+>
+  <section class="denpa-container" style="padding-top: 44px; padding-bottom: 52px;">
+    <div class="denpa-section-header">
+      <div class="denpa-section-header-left">
+        <h1 class="denpa-section-title">八千年时空闭环</h1>
+        <span class="denpa-section-en">TIMELINE</span>
+      </div>
+      <span class="denpa-section-more">EPOCH 01 ↔ EPOCH 06 · 莫比乌斯因果轴</span>
+    </div>
+
+    <div class="denpa-timeline-toolbar">
+      <div class="denpa-timeline-hint">
+        <span aria-hidden="true">⚠</span>
+        <span>本年表梳理了《超かぐや姫！》的核心因果闭环；未观影者默认折叠剧透节点，可单独点击或一键解锁。</span>
+      </div>
+      <button
+        type="button"
+        class="denpa-spoiler-toggle"
+        data-timeline-reveal-all
+        aria-pressed="false"
+      >
+        展开全部剧透节点
+      </button>
+    </div>
+
+    <ol class="denpa-timeline" data-timeline>
+      {TIMELINE_EPOCHS.map((ep) => (
+        <li
+          class:list={['denpa-epoch', { 'is-spoiler-locked': ep.spoiler }]}
+          data-epoch-item
+          data-epoch-spoiler={ep.spoiler ? '1' : '0'}
+          style={`--epoch-accent: ${ep.accent};`}
+        >
+          <span class="denpa-epoch-dot" aria-hidden="true"></span>
+
+          <div class="denpa-epoch-card">
+            <div class="denpa-epoch-head">
+              <div>
+                <div class="denpa-epoch-meta">
+                  <span>{ep.index}</span>
+                  <span>//</span>
+                  <span>{ep.era}</span>
+                  <span class="denpa-epoch-loc">· {ep.location}</span>
+                </div>
+                <h2 class="denpa-epoch-title">{ep.title}</h2>
+              </div>
+
+              {ep.spoiler && (
+                <button
+                  type="button"
+                  class="denpa-epoch-unlock"
+                  data-epoch-toggle
+                  aria-pressed="false"
+                >
+                  解锁剧透
+                </button>
+              )}
+            </div>
+
+            <div class="denpa-epoch-body" data-epoch-body>
+              <p class="denpa-epoch-summary">{ep.summary}</p>
+              <p class="denpa-epoch-detail">{ep.detail}</p>
+              {ep.link && (
+                <a class="denpa-epoch-link" href={ep.link.href}>
+                  {ep.link.label} →
+                </a>
+              )}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="denpa-loop-badge">
+      <span>∞</span>
+      <span>CAUSAL LOOP CLOSED · EPOCH 05 满月折返接续 EPOCH 01，直抵 EPOCH 06 的现实重逢</span>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { CHARACTERS } from '../data/characters';
+---
+
+<BaseLayout
+  title="人物档案"
+  activeNav="/characters/"
+  backdrop="/images/route-02-tsukuyomi.jpg"
+>
+  <section class="denpa-container" style="padding-top: 44px; padding-bottom: 48px;">
+    <div class="denpa-section-header">
+      <div class="denpa-section-header-left">
+        <h1 class="denpa-section-title">角色频段档案</h1>
+        <span class="denpa-section-en">CHARACTERS</span>
+      </div>
+      <span class="denpa-section-more">官网正版立绘 · 支持切换月读 / 现实形态</span>
+    </div>
+
+    <div class="denpa-char-list">
+      {CHARACTERS.map((char) => (
+        <article
+          class="denpa-char-card"
+          data-char-card
+          style={`--char-accent: ${char.accent};`}
+          data-reveal
+        >
+          <div class="denpa-char-stage">
+            <span class="denpa-reticle is-tl" aria-hidden="true"></span>
+            <span class="denpa-reticle is-tr" aria-hidden="true"></span>
+            <span class="denpa-reticle is-bl" aria-hidden="true"></span>
+            <span class="denpa-reticle is-br" aria-hidden="true"></span>
+
+            <div class="denpa-char-glow" aria-hidden="true"></div>
+            <img
+              class="denpa-char-sprite"
+              data-char-sprite
+              src={char.forms[0].image}
+              alt={`${char.name} — ${char.forms[0].label}`}
+              loading="lazy"
+            />
+            <div class="denpa-char-stage-cap" data-char-caption>
+              {char.forms[0].caption}
+            </div>
+          </div>
+
+          <div class="denpa-char-info">
+            <div class="denpa-char-eyebrow">
+              <span>{char.code} · {char.frequency}</span>
+              <span class="denpa-char-cv">{char.cv}</span>
+            </div>
+
+            <div class="denpa-char-name-row">
+              <h2 class="denpa-char-name">{char.name}</h2>
+              <span class="denpa-char-jp">{char.jpName}</span>
+            </div>
+
+            <div class="denpa-char-role">{char.role}</div>
+
+            {char.forms.length > 1 && (
+              <div class="denpa-char-forms" role="group" aria-label={`切换 ${char.name} 的服装形态`}>
+                {char.forms.map((form, fIdx) => (
+                  <button
+                    type="button"
+                    class:list={['denpa-form-btn', { 'is-active': fIdx === 0 }]}
+                    data-form-btn
+                    data-form-src={form.image}
+                    data-form-caption={form.caption}
+                    data-form-alt={`${char.name} — ${form.label}`}
+                    aria-pressed={fIdx === 0 ? 'true' : 'false'}
+                  >
+                    {form.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <blockquote class="denpa-char-quote">{char.quote}</blockquote>
+            <p class="denpa-char-bio">{char.bio}</p>
+
+            <div class="denpa-char-footer">
+              <div class="denpa-tags" style="margin-top: 0; padding-top: 0;">
+                {char.tags.map((tag) => (
+                  <span class="denpa-tag">{tag}</span>
+                ))}
+              </div>
+              <a class="denpa-char-link" href={char.relatedRoute.href}>
+                {char.relatedRoute.label} →
+              </a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

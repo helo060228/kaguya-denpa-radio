@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="深夜电波留言墙"
+  activeNav="/guestbook/"
+  backdrop="/images/gallery-tsukuyomi-city.jpg"
+>
+  <section class="denpa-container" style="padding-top: 44px; padding-bottom: 52px;">
+    <div class="denpa-section-header">
+      <div class="denpa-section-header-left">
+        <h1 class="denpa-section-title">深夜电波留言墙</h1>
+        <span class="denpa-section-en">SIGNAL WALL</span>
+      </div>
+      <span class="denpa-section-more" data-gb-status>// 正在同步频段记录…</span>
+    </div>
+
+    <div class="denpa-gb-layout">
+      <!-- Signal Composer -->
+      <form class="denpa-gb-form" data-gb-form novalidate>
+        <div class="denpa-gb-form-head">
+          <span class="denpa-eyebrow" style="margin: 0;">// TRANSMIT NEW MESSAGE</span>
+          <span class="denpa-gb-hint">无需注册 · 匿名留声</span>
+        </div>
+
+        <div class="denpa-gb-row">
+          <label class="denpa-field">
+            <span>呼号 / 昵称</span>
+            <input
+              type="text"
+              name="author"
+              maxlength="20"
+              placeholder="匿名收听者"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="denpa-field">
+            <span>发射频段</span>
+            <select name="channel">
+              <option value="5">8000.00 kHz · 综合月读频段</option>
+              <option value="1">101.40 MHz · ROUTE 01 电线杆</option>
+              <option value="2">102.15 MHz · ROUTE 02 月读舞台</option>
+              <option value="3">104.80 MHz · ROUTE 03 曲目志</option>
+              <option value="4">106.20 MHz · ROUTE 04 满月折返</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Anti-spam honeypot -->
+        <input type="text" name="website" tabindex="-1" autocomplete="off" style="display: none;" aria-hidden="true" />
+
+        <label class="denpa-field">
+          <span class="denpa-field-label-row">
+            <span>电波正文</span>
+            <em data-gb-charcount>0 / 240</em>
+          </span>
+          <textarea
+            name="message"
+            rows="4"
+            maxlength="240"
+            required
+            placeholder="写一句想留给八千年后、或留给《超时空辉夜姬！》的话……"
+          ></textarea>
+        </label>
+
+        <div class="denpa-gb-actions">
+          <p class="denpa-gb-feedback" data-gb-feedback aria-live="polite"></p>
+          <button type="submit" class="denpa-btn-primary" data-gb-submit>
+            <span>▶ 发送电波讯号</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Live Signal Feed -->
+      <div class="denpa-gb-feed-wrap">
+        <div class="denpa-gb-feed-bar">
+          <span>RECEIVED SIGNALS</span>
+          <span data-gb-count>—</span>
+        </div>
+        <div class="denpa-gb-feed" data-gb-feed>
+          <div class="denpa-gb-loading">正在接收频段讯号…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

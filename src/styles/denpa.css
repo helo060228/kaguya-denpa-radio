@@ -1450,6 +1450,756 @@ a.denpa-section-more:hover {
 }
 
 /* ==========================================================================
+   Multi-Channel Ambient Tuner Popover & Random Quote Receiver
+   ========================================================================== */
+
+.denpa-tuner-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.denpa-tuner-wrap .denpa-audio-btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.denpa-tuner-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: none;
+  border-radius: 0 2px 2px 0;
+  background: rgba(8, 11, 28, 0.60);
+  color: var(--text-muted);
+  font-size: 0.70rem;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.denpa-tuner-chevron:hover,
+.denpa-tuner-chevron[aria-expanded="true"] {
+  border-color: var(--border-gold);
+  color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.10);
+}
+
+.denpa-tuner-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 248px;
+  padding: 14px;
+  background: rgba(6, 9, 25, 0.96);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-gold);
+  border-radius: 2px;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.72);
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 70;
+}
+
+.denpa-tuner-popover.is-open {
+  display: flex;
+}
+
+.denpa-tuner-title {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-cyan);
+}
+
+.denpa-tuner-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.denpa-ch-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 7px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  background: rgba(14, 19, 46, 0.55);
+  color: var(--text-body);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.denpa-ch-btn em {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-dim);
+}
+
+.denpa-ch-btn:hover,
+.denpa-ch-btn.is-active {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.11);
+}
+
+.denpa-ch-btn.is-active em {
+  color: var(--accent-gold);
+}
+
+.denpa-tuner-vol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  color: var(--text-muted);
+}
+
+.denpa-tuner-vol input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent-gold);
+  cursor: pointer;
+}
+
+/* Random Signal Quote Button + CRT Glitch Transition */
+.denpa-quote-tune-wrap {
+  margin-top: 26px;
+}
+
+.denpa-tune-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-gold-faint);
+  border-radius: 2px;
+  background: rgba(8, 11, 28, 0.56);
+  color: var(--accent-gold);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+  transition: border-color 0.22s ease, color 0.22s ease, background 0.22s ease, transform 0.22s ease;
+}
+
+.denpa-tune-btn:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.11);
+}
+
+.denpa-interlude-quote.is-glitching {
+  opacity: 0.45;
+  transform: translateX(2px);
+  text-shadow: 3px 0 0 rgba(219, 105, 130, 0.7), -3px 0 0 rgba(112, 184, 206, 0.7);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+/* ==========================================================================
+   Characters Archival Dossier (/characters/)
+   ========================================================================== */
+
+.denpa-char-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.denpa-char-card {
+  --char-accent: var(--accent-gold);
+  display: grid;
+  grid-template-columns: minmax(260px, 370px) minmax(0, 1fr);
+  background: var(--bg-surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--char-accent);
+  border-radius: 2px;
+  overflow: hidden;
+  transition: border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+.denpa-char-card:hover {
+  border-color: color-mix(in srgb, var(--char-accent) 65%, transparent);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--char-accent) 18%, transparent);
+}
+
+.denpa-char-stage {
+  position: relative;
+  min-height: 410px;
+  padding: 24px 18px 36px;
+  background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--char-accent) 18%, #0a0f28) 0%, #050816 78%);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.denpa-char-glow {
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--char-accent) 28%, transparent) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.denpa-char-sprite {
+  position: relative;
+  z-index: 2;
+  max-height: 360px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.58));
+  transition: opacity 0.24s ease, transform 0.35s ease;
+}
+
+.denpa-char-sprite.is-swapping {
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+}
+
+.denpa-char-stage-cap {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 10px;
+  z-index: 3;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.10em;
+  color: var(--text-dim);
+}
+
+.denpa-char-info {
+  padding: clamp(22px, 3vw, 34px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.denpa-char-eyebrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  color: var(--char-accent);
+}
+
+.denpa-char-cv {
+  color: var(--text-muted);
+}
+
+.denpa-char-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.denpa-char-name {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.65rem, 3vw, 2.15rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-ivory);
+}
+
+.denpa-char-jp {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+.denpa-char-role {
+  font-size: 0.86rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.denpa-char-forms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.denpa-form-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--border-tag);
+  border-radius: 2px;
+  background: rgba(6, 9, 24, 0.65);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 0.22s ease, color 0.22s ease, background 0.22s ease;
+}
+
+.denpa-form-btn:hover,
+.denpa-form-btn.is-active {
+  border-color: var(--char-accent);
+  color: var(--text-ivory);
+  background: color-mix(in srgb, var(--char-accent) 18%, rgba(6, 9, 24, 0.75));
+}
+
+.denpa-char-quote {
+  margin: 4px 0 0;
+  padding: 8px 0 8px 14px;
+  border-left: 2px solid var(--char-accent);
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.denpa-char-bio {
+  margin: 0;
+  font-size: 0.90rem;
+  line-height: 1.95;
+  color: var(--text-body);
+}
+
+.denpa-char-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.denpa-char-link {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: var(--char-accent);
+  transition: opacity 0.2s ease;
+}
+
+.denpa-char-link:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ==========================================================================
+   8000-Year Causal Loop Timeline (/timeline/)
+   ========================================================================== */
+
+.denpa-timeline-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 13px 18px;
+  margin-bottom: 34px;
+  border: 1px dashed var(--border-rose-dash);
+  border-radius: 2px;
+  background: rgba(185, 72, 100, 0.08);
+  color: var(--accent-rose-soft);
+  font-size: 0.84rem;
+}
+
+.denpa-timeline-hint {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.denpa-timeline {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 4px 34px;
+}
+
+.denpa-timeline::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent-gold), rgba(112, 184, 206, 0.45) 55%, var(--accent-gold));
+}
+
+.denpa-epoch {
+  --epoch-accent: var(--accent-gold);
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.denpa-epoch:last-child {
+  margin-bottom: 0;
+}
+
+.denpa-epoch-dot {
+  position: absolute;
+  left: -30px;
+  top: 22px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--epoch-accent);
+  background: #050714;
+  transform: rotate(45deg);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--epoch-accent) 55%, transparent);
+}
+
+.denpa-epoch-card {
+  padding: 20px 24px;
+  background: var(--bg-surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--epoch-accent);
+  border-radius: 2px;
+}
+
+.denpa-epoch-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.denpa-epoch-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--epoch-accent);
+  margin-bottom: 6px;
+}
+
+.denpa-epoch-loc {
+  color: var(--text-dim);
+}
+
+.denpa-epoch-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.24rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-ivory);
+}
+
+.denpa-epoch-unlock {
+  padding: 4px 10px;
+  border: 1px solid var(--border-rose-dash);
+  border-radius: 2px;
+  background: rgba(185, 72, 100, 0.14);
+  color: var(--accent-rose-soft);
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.denpa-epoch-unlock:hover {
+  background: rgba(217, 126, 148, 0.24);
+  color: #ffe8ee;
+}
+
+.denpa-epoch-body {
+  transition: filter 0.35s ease, opacity 0.35s ease;
+}
+
+.denpa-epoch.is-spoiler-locked .denpa-epoch-body {
+  filter: blur(7px);
+  opacity: 0.36;
+  user-select: none;
+  pointer-events: none;
+}
+
+.denpa-epoch-summary {
+  margin: 0 0 8px;
+  font-size: 0.94rem;
+  line-height: 1.85;
+  color: var(--text-primary);
+}
+
+.denpa-epoch-detail {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.88;
+  color: var(--text-muted);
+}
+
+.denpa-epoch-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: var(--epoch-accent);
+}
+
+.denpa-epoch-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.denpa-loop-badge {
+  margin-top: 28px;
+  padding: 13px 18px;
+  border: 1px solid var(--border-gold-faint);
+  border-radius: 2px;
+  background: rgba(212, 175, 76, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.10em;
+  color: var(--accent-gold);
+  text-align: center;
+}
+
+/* ==========================================================================
+   Anonymous Signal Guestbook Wall (/guestbook/)
+   ========================================================================== */
+
+.denpa-gb-layout {
+  display: grid;
+  grid-template-columns: minmax(290px, 420px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.denpa-gb-form {
+  padding: 22px;
+  background: var(--bg-surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-gold-faint);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.denpa-gb-form-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.denpa-gb-hint {
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  color: var(--text-dim);
+}
+
+.denpa-gb-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.denpa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.denpa-field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.denpa-field-label-row em {
+  font-style: normal;
+  color: var(--text-dim);
+}
+
+.denpa-field input,
+.denpa-field select,
+.denpa-field textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--border-tag);
+  border-radius: 2px;
+  background: rgba(5, 7, 20, 0.85);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.denpa-field input:focus,
+.denpa-field select:focus,
+.denpa-field textarea:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 12px rgba(212, 175, 76, 0.18);
+}
+
+.denpa-field textarea {
+  resize: vertical;
+  min-height: 108px;
+}
+
+.denpa-gb-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.denpa-gb-feedback {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--accent-cyan-bright);
+  min-height: 1.2em;
+}
+
+.denpa-gb-feedback.is-error {
+  color: var(--accent-rose-soft);
+}
+
+.denpa-gb-feed-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.denpa-gb-feed-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.denpa-gb-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.denpa-gb-loading {
+  padding: 28px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  border: 1px dashed var(--border-subtle);
+}
+
+.denpa-signal-item {
+  --sig-accent: var(--route-5);
+  padding: 16px 18px;
+  background: var(--bg-surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--sig-accent);
+  border-radius: 2px;
+}
+
+.denpa-signal-item[data-ch="1"] { --sig-accent: var(--route-1); }
+.denpa-signal-item[data-ch="2"] { --sig-accent: var(--route-2); }
+.denpa-signal-item[data-ch="3"] { --sig-accent: var(--route-3); }
+.denpa-signal-item[data-ch="4"] { --sig-accent: var(--route-4); }
+.denpa-signal-item[data-ch="5"] { --sig-accent: var(--route-5); }
+
+.denpa-signal-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.denpa-signal-author {
+  color: var(--sig-accent);
+  font-weight: 500;
+}
+
+.denpa-signal-time {
+  color: var(--text-dim);
+}
+
+.denpa-signal-msg {
+  margin: 0;
+  font-size: 0.90rem;
+  line-height: 1.85;
+  color: var(--text-body);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 960px) {
+  .denpa-char-card,
+  .denpa-gb-layout {
+    grid-template-columns: 1fr;
+  }
+  .denpa-char-stage {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    min-height: 340px;
+  }
+}
+
+@media (max-width: 760px) {
+  .denpa-nav {
+    gap: 10px;
+  }
+  .denpa-nav-links {
+    overflow-x: auto;
+    max-width: 52vw;
+    scrollbar-width: none;
+  }
+  .denpa-nav-links::-webkit-scrollbar {
+    display: none;
+  }
+  .denpa-gb-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
    Responsive & Reduced-Motion Guardrails
    ========================================================================== */
 

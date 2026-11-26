@@ -14,7 +14,14 @@ import { GALLERY_PLATES } from '../data/gallery';
         <h1 class="denpa-section-title">回廊</h1>
         <span class="denpa-section-en">GALLERY</span>
       </div>
-      <span class="denpa-section-more">共 06 幅官图 · 点击展开暗房预览</span>
+      <span class="denpa-section-more" data-gallery-count>当前显示 9 / 9 幅官图 · 点击展开暗房预览</span>
+    </div>
+
+    <div class="denpa-filter-bar" role="group" aria-label="按原画类型筛选">
+      <button type="button" class="denpa-filter-btn is-active" data-gallery-filter="all">全部 09 幅</button>
+      <button type="button" class="denpa-filter-btn" data-gallery-filter="key-visual">官方主视觉</button>
+      <button type="button" class="denpa-filter-btn" data-gallery-filter="scene-art">美术场景原画</button>
+      <button type="button" class="denpa-filter-btn" data-gallery-filter="mv-still">4K MV 静止帧</button>
     </div>
 
     <div class="denpa-grid-3">
@@ -23,11 +30,13 @@ import { GALLERY_PLATES } from '../data/gallery';
           id={plate.id}
           type="button"
           class="denpa-gallery-tile"
+          data-gallery-card
+          data-gallery-cat={plate.category}
           data-lightbox-index={String(idx)}
           data-lightbox-src={plate.src}
           data-lightbox-fig={`${plate.fig} — ${plate.title}`}
           data-lightbox-title={plate.title}
-          data-lightbox-caption={plate.caption}
+          data-lightbox-caption={`${plate.categoryLabel} · ${plate.caption}`}
           aria-label={`放大查看 ${plate.fig} ${plate.title}`}
         >
           <img src={plate.src} alt={plate.title} loading="lazy" />
@@ -40,7 +49,7 @@ import { GALLERY_PLATES } from '../data/gallery';
     </div>
   </section>
 
-  <!-- Exhibition CRT Darkroom Lightbox (Keyboard ←/→ + Pure Art Toggle) -->
+  <!-- Exhibition CRT Darkroom Lightbox (Keyboard ←/→ + Pure Art Mode) -->
   <div id="denpa-lightbox" class="denpa-lightbox" role="dialog" aria-modal="true" aria-label="暗房原画预览">
     <div class="denpa-lightbox-inner">
       <span class="denpa-reticle is-tl" aria-hidden="true"></span>
@@ -49,7 +58,7 @@ import { GALLERY_PLATES } from '../data/gallery';
       <span class="denpa-reticle is-br" aria-hidden="true"></span>
 
       <div class="denpa-lightbox-topbar">
-        <span class="denpa-lightbox-counter" data-lightbox-counter>01 / 06</span>
+        <span class="denpa-lightbox-counter" data-lightbox-counter>01 / 09</span>
         <div class="denpa-lightbox-controls">
           <button type="button" class="denpa-lightbox-btn" data-lightbox-crt aria-pressed="false" title="临时隐藏全局扫描线查看无损原画">
             纯原画模式

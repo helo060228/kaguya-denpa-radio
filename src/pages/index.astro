@@ -2,9 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { POSTS } from '../data/posts';
 import { GALLERY_PLATES } from '../data/gallery';
+import { SITE } from '../data/site';
 
 const latestPosts = POSTS.slice(0, 3);
 const previewGallery = GALLERY_PLATES.slice(0, 3);
+const initialQuote = SITE.randomTransmissions[0];
 ---
 
 <BaseLayout
@@ -18,7 +20,7 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
       <p class="denpa-eyebrow">// TRANSMISSION RECEIVED · 2026.01.22</p>
       <h1 class="denpa-hero-title">超时空辉夜姬</h1>
       <p class="denpa-hero-lead">
-        这里是一座建在虚拟空间「月读」边缘的小小电波台。收录关于《超かぐや姫！》的官方原画、曲目笔记，以及跨越八千年依然在寻找回音的讯号。
+        这里是一座建在虚拟空间「月读」边缘的小小电波台。收录关于《超かぐや姫！》的官方原画、角色与时间线档案，以及跨越八千年依然在寻找回音的讯号。
       </p>
 
       <div class="denpa-countdown-block">
@@ -33,7 +35,8 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
         <a class="denpa-btn-primary" href="/posts/">
           <span>▶ 开始收听记录</span>
         </a>
-        <a class="denpa-btn-ghost" href="/gallery/">进入原画回廊</a>
+        <a class="denpa-btn-ghost" href="/characters/">查阅角色档案</a>
+        <a class="denpa-btn-ghost" href="/guestbook/">留下电波讯号</a>
       </div>
     </div>
 
@@ -54,13 +57,23 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
     </a>
   </section>
 
-  <!-- Act 2: Full-Bleed Floating Poetic Quote Interlude -->
+  <!-- Act 2: Full-Bleed Floating Poetic Quote Interlude + Random Signal Receiver -->
   <section id="interlude" class="denpa-interlude" data-reveal>
-    <blockquote class="denpa-interlude-quote">
-      「哪怕坠落回 <span class="hl-gold">8000年前</span>，也要为你筑起一座月读。」<br />
-      「那么，这一次，让我们改写竹取物语的结局吧。」
+    <blockquote
+      class="denpa-interlude-quote"
+      data-random-quote-text
+      data-quotes-json={JSON.stringify(SITE.randomTransmissions)}
+    >
+      <span set:html={initialQuote.lines[0]} /><br />
+      <span set:html={initialQuote.lines[1]} />
     </blockquote>
-    <p class="denpa-interlude-source">— 东京深夜，发光的电线杆之下</p>
+    <p class="denpa-interlude-source" data-random-quote-source>{initialQuote.source}</p>
+    <div class="denpa-quote-tune-wrap">
+      <button type="button" class="denpa-tune-btn" data-random-quote-btn>
+        <span aria-hidden="true">⟳</span>
+        <span>接收随机电波</span>
+      </button>
+    </div>
   </section>
 
   <!-- Act 3: Latest Transmissions Preview -->
@@ -108,7 +121,7 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
         <h2 class="denpa-section-title">回廊</h2>
         <span class="denpa-section-en">GALLERY</span>
       </div>
-      <a class="denpa-section-more" href="/gallery/">浏览全部 06 幅原画 →</a>
+      <a class="denpa-section-more" href="/gallery/">浏览全部 09 幅原画 →</a>
     </div>
 
     <div class="denpa-grid-3">

@@ -75,18 +75,52 @@ const {
           ))}
         </ul>
 
-        <button
-          type="button"
-          class="denpa-audio-btn"
-          data-denpa-audio
-          aria-pressed="false"
-          aria-label="切换深夜短波背景白噪声"
-          title="点击开启或关闭深夜电波环境底噪"
-          transition:persist="denpa-audio"
-        >
-          <span class="denpa-eq" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span data-audio-label>((•)) OFF</span>
-        </button>
+        <!-- Persistent Multi-Channel Ambient Tuner -->
+        <div class="denpa-tuner-wrap" transition:persist="denpa-tuner">
+          <button
+            type="button"
+            class="denpa-audio-btn"
+            data-denpa-audio
+            aria-pressed="false"
+            aria-label="开关深夜氛围电波"
+            title="左键一键开关音频，右侧▾切换频道"
+          >
+            <span class="denpa-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span data-audio-label>((•)) OFF</span>
+          </button>
+          <button
+            type="button"
+            class="denpa-tuner-chevron"
+            data-tuner-toggle
+            aria-expanded="false"
+            aria-label="展开多声道氛围调频面板"
+            title="切换氛围声道（白噪 / 夜雨 / 月读和弦）"
+          >
+            ▾
+          </button>
+
+          <div class="denpa-tuner-popover" data-tuner-popover role="dialog" aria-label="深夜电波调频器">
+            <div class="denpa-tuner-title">// AMBIENT TUNER · 选择氛围声道</div>
+            <div class="denpa-tuner-channels" role="radiogroup" aria-label="氛围声道">
+              <button type="button" class="denpa-ch-btn is-active" data-audio-channel="static" aria-checked="true">
+                <span>CH.01 短波白噪</span>
+                <em>8000 kHz</em>
+              </button>
+              <button type="button" class="denpa-ch-btn" data-audio-channel="rain" aria-checked="false">
+                <span>CH.02 东京夜雨</span>
+                <em>101.4 MHz</em>
+              </button>
+              <button type="button" class="denpa-ch-btn" data-audio-channel="pad" aria-checked="false">
+                <span>CH.03 月读和弦</span>
+                <em>104.8 MHz</em>
+              </button>
+            </div>
+            <label class="denpa-tuner-vol">
+              <span>音量</span>
+              <input type="range" min="10" max="100" value="65" data-audio-volume />
+            </label>
+          </div>
+        </div>
       </nav>
 
       {readingAccent && (
