@@ -7,12 +7,14 @@ interface Props {
   title: string;
   activeNav: string;
   backdrop?: string;
+  readingAccent?: string;
 }
 
 const {
   title,
   activeNav,
   backdrop = '/images/backdrop-main.jpg',
+  readingAccent,
 } = Astro.props;
 ---
 
@@ -33,16 +35,16 @@ const {
     <ClientRouter />
   </head>
   <body>
-    <!-- Layer -3 & -2: Full-Bleed Dimmed CG Backdrop + Radial Dark Vignette -->
+    <!-- Layer 0 & 1: Full-Bleed Dimmed CG Backdrop + Radial Dark Vignette -->
     <div class="denpa-backdrop" style={`background-image: url('${backdrop}');`}></div>
     <div class="denpa-vignette" aria-hidden="true"></div>
 
-    <!-- Layer -1: Persistent Ambient Canvas (Survives Route Transitions) -->
+    <!-- Layer 2: Persistent Ambient Canvas (Survives Route Transitions) -->
     <canvas id="denpa-ambient" class="denpa-ambient-canvas" aria-hidden="true" transition:persist="denpa-canvas"></canvas>
 
     <!-- Layer 40: Sticky Translucent Top Navigation -->
     <header class="denpa-nav">
-      <a class="denpa-brand" href="/">
+      <a class="denpa-brand" href="/" aria-label="返回月读电波台首页">
         <svg class="denpa-brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <g transform="translate(12 12)">
             <ellipse rx="1.6" ry="4.6" cy="-6" />
@@ -78,15 +80,26 @@ const {
           class="denpa-audio-btn"
           data-denpa-audio
           aria-pressed="false"
-          title="开关短波电波背景噪声"
+          aria-label="切换深夜短波背景白噪声"
+          title="点击开启或关闭深夜电波环境底噪"
           transition:persist="denpa-audio"
         >
-          ((•)) OFF
+          <span class="denpa-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span data-audio-label>((•)) OFF</span>
         </button>
       </nav>
+
+      {readingAccent && (
+        <div
+          class="denpa-reading-progress"
+          data-reading-progress
+          style={`--progress-accent: ${readingAccent};`}
+          aria-hidden="true"
+        />
+      )}
     </header>
 
-    <!-- Layer 1: Page Content -->
+    <!-- Layer 10: Page Content -->
     <main>
       <slot />
     </main>
@@ -96,6 +109,25 @@ const {
       <div>{SITE.copyright}</div>
       <div class="denpa-footer-signal">{SITE.frequency}</div>
     </footer>
+
+    <!-- Subtle Back-to-Top Beacon & Live Signal Toast -->
+    <button
+      type="button"
+      class="denpa-top-btn"
+      data-back-to-top
+      aria-label="返回页面顶部"
+      title="返回顶部"
+    >
+      ↑ TOP
+    </button>
+
+    <div
+      class="denpa-toast"
+      data-denpa-toast
+      role="status"
+      aria-live="polite"
+      transition:persist="denpa-toast"
+    ></div>
 
     <!-- Layer 45: Fixed Bottom Infinite Marquee -->
     <aside class="denpa-marquee" aria-label="电波跑马灯" transition:persist="denpa-marquee">
@@ -110,7 +142,7 @@ const {
     </aside>
 
     <!-- Layer 50: Global CRT Scanlines -->
-    <div class="denpa-scanlines" aria-hidden="true"></div>
+    <div class="denpa-scanlines" data-scanlines aria-hidden="true"></div>
 
     <script>
       import { bootDenpaAtmosphere } from '../scripts/ambient.js';

@@ -18,7 +18,7 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
       <p class="denpa-eyebrow">// TRANSMISSION RECEIVED · 2026.01.22</p>
       <h1 class="denpa-hero-title">超时空辉夜姬</h1>
       <p class="denpa-hero-lead">
-        这里是一座建在虚拟空间「月读」边缘的小小电波台。收录关于《超かぐや姫！》的图、曲目笔记，以及跨越八千年依然在寻找回音的讯号。
+        这里是一座建在虚拟空间「月读」边缘的小小电波台。收录关于《超かぐや姫！》的官方原画、曲目笔记，以及跨越八千年依然在寻找回音的讯号。
       </p>
 
       <div class="denpa-countdown-block">
@@ -31,22 +31,31 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
 
       <div class="denpa-actions">
         <a class="denpa-btn-primary" href="/posts/">
-          <span>▶ 开始收听</span>
+          <span>▶ 开始收听记录</span>
         </a>
-        <a class="denpa-btn-ghost" href="/gallery/">进入回廊</a>
+        <a class="denpa-btn-ghost" href="/gallery/">进入原画回廊</a>
       </div>
     </div>
 
     <figure class="denpa-hero-plate-wrap">
+      <span class="denpa-reticle is-tl" aria-hidden="true"></span>
+      <span class="denpa-reticle is-tr" aria-hidden="true"></span>
+      <span class="denpa-reticle is-bl" aria-hidden="true"></span>
+      <span class="denpa-reticle is-br" aria-hidden="true"></span>
       <div class="denpa-hero-plate">
         <img src="/images/hero-portrait.jpg" alt="星轨之下的钢琴与歌声" />
       </div>
       <figcaption class="denpa-plate-caption">FIG.01 — 星轨之下的钢琴与歌声</figcaption>
     </figure>
+
+    <a class="denpa-scroll-cue" href="#interlude" data-scroll-cue aria-label="向下滚动阅读金句与归档">
+      <span>SCROLL TO TUNE</span>
+      <i aria-hidden="true">↓</i>
+    </a>
   </section>
 
-  <!-- Act 2: Full-Bleed Floating Poetic Quote Interlude (No Card Box) -->
-  <section class="denpa-interlude">
+  <!-- Act 2: Full-Bleed Floating Poetic Quote Interlude -->
+  <section id="interlude" class="denpa-interlude" data-reveal>
     <blockquote class="denpa-interlude-quote">
       「哪怕坠落回 <span class="hl-gold">8000年前</span>，也要为你筑起一座月读。」<br />
       「那么，这一次，让我们改写竹取物语的结局吧。」
@@ -55,18 +64,23 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
   </section>
 
   <!-- Act 3: Latest Transmissions Preview -->
-  <section class="denpa-container denpa-section-block">
+  <section class="denpa-container denpa-section-block" data-reveal>
     <div class="denpa-section-header">
       <div class="denpa-section-header-left">
         <h2 class="denpa-section-title">电波记录</h2>
         <span class="denpa-section-en">TRANSMISSIONS</span>
       </div>
-      <a class="denpa-section-more" href="/posts/">ALL 05 ROUTES →</a>
+      <a class="denpa-section-more" href="/posts/">查看全部 05 条记录 →</a>
     </div>
 
     <div class="denpa-grid-3">
-      {latestPosts.map((post) => (
-        <a class="denpa-card" data-route={String(post.routeNum)} href={`/posts/${post.slug}/`}>
+      {latestPosts.map((post, idx) => (
+        <a
+          class="denpa-card"
+          data-route={String(post.routeNum)}
+          style={`--stagger: ${idx};`}
+          href={`/posts/${post.slug}/`}
+        >
           <div class="denpa-card-thumb">
             <img src={post.cover} alt={post.title} loading="lazy" />
           </div>
@@ -75,6 +89,7 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
               {post.date} // {post.routeCode} · {post.routeSubtitle}
             </div>
             <h3 class="denpa-card-title">{post.title}</h3>
+            <p class="denpa-card-excerpt">{post.excerpt}</p>
             <div class="denpa-tags">
               {post.tags.map((tag) => (
                 <span class="denpa-tag">{tag}</span>
@@ -87,13 +102,13 @@ const previewGallery = GALLERY_PLATES.slice(0, 3);
   </section>
 
   <!-- Act 4: Gallery Preview -->
-  <section class="denpa-container denpa-section-block">
+  <section class="denpa-container denpa-section-block" data-reveal>
     <div class="denpa-section-header">
       <div class="denpa-section-header-left">
         <h2 class="denpa-section-title">回廊</h2>
         <span class="denpa-section-en">GALLERY</span>
       </div>
-      <a class="denpa-section-more" href="/gallery/">ENTER ARCHIVE →</a>
+      <a class="denpa-section-more" href="/gallery/">浏览全部 06 幅原画 →</a>
     </div>
 
     <div class="denpa-grid-3">

@@ -18,7 +18,7 @@ import { SITE } from '../data/site';
 
     <div class="denpa-about-grid">
       <div class="denpa-about-art">
-        <img src="/images/about-triptych.jpg" alt="超时空辉夜姬官方角色三联画" />
+        <img src="/images/about-triptych.jpg" alt="超时空辉夜姬官方角色三联画（月见八千代、酒寄彩叶、辉夜）" />
       </div>
 
       <div class="denpa-about-copy">
@@ -34,17 +34,20 @@ import { SITE } from '../data/site';
           <li>制作：Studio Colorido × STUDIO CHROMATO</li>
           <li>声优：夏吉优子（辉夜）· 永濑安奈（酒寄彩叶）· 早见沙织（月见八千代）</li>
           <li>技术：Astro · 纯静态 · 无追踪</li>
-          <li>提示：右上角 ((•)) 可以打开电波噪声。</li>
+          <li>提示：点击右上角 ((•)) 可开启深夜短波环境底噪，跨页浏览不会中断。</li>
         </ul>
 
         <div class="denpa-discography">
-          <h2 class="denpa-discography-title">// BROADCAST PLAYLIST · 收录曲目志</h2>
+          <h2 class="denpa-discography-title">// BROADCAST PLAYLIST · 收录曲目志（点击跳转对应笔记）</h2>
           <div class="denpa-discography-grid">
             {SITE.discography.map((track) => (
-              <div class="denpa-disc-item">
-                <span class="denpa-disc-name">{track.title}</span>
+              <a class="denpa-disc-item" href={track.href}>
+                <div class="denpa-disc-head">
+                  <span class="denpa-disc-name">{track.title}</span>
+                  <span class="denpa-disc-link">{track.routeHint} →</span>
+                </div>
                 <span class="denpa-disc-meta">{track.meta}</span>
-              </div>
+              </a>
             ))}
           </div>
         </div>

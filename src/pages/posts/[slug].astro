@@ -27,11 +27,14 @@ const routeVar = `var(--route-${post.routeNum})`;
   title={post.title}
   activeNav="/posts/"
   backdrop={post.backdrop}
+  readingAccent={routeVar}
 >
   <article style={`--route-accent: ${routeVar};`}>
     <header class="denpa-article-header">
-      <a class="denpa-back-link" href="/posts/">← RETURN TO TRANSMISSIONS</a>
-      <div class="denpa-article-date">{post.date}</div>
+      <a class="denpa-back-link" href="/posts/">← 返回电波记录列表</a>
+      <div class="denpa-article-date">
+        {post.date} · {post.readTime} · {post.frequency}
+      </div>
       <h1 class="denpa-article-title">{post.title}</h1>
       <div class="denpa-article-route">
         {post.routeCode} · {post.routeSubtitle}
@@ -46,36 +49,48 @@ const routeVar = `var(--route-${post.routeNum})`;
     <div class="denpa-prose">
       {post.spoiler && (
         <aside class="denpa-spoiler-box" role="note">
-          <span aria-hidden="true">⚠</span>
-          <span>内含核心剧情反转相关的感想，介意请先观看原作《超时空辉夜姬！》。</span>
+          <div class="denpa-spoiler-msg">
+            <span aria-hidden="true">⚠</span>
+            <span>内含核心剧情反转感想，未观影可先暂遮正文，或移步其他无剧透路线。</span>
+          </div>
+          <button
+            type="button"
+            class="denpa-spoiler-toggle"
+            data-spoiler-toggle
+            aria-pressed="false"
+          >
+            暂遮正文
+          </button>
         </aside>
       )}
 
-      {post.paragraphs.map((html) => (
-        <p set:html={html} />
-      ))}
+      <div class="denpa-prose-body" data-spoiler-body>
+        {post.paragraphs.map((html) => (
+          <p set:html={html} />
+        ))}
 
-      {post.quote && <blockquote>{post.quote}</blockquote>}
+        {post.quote && <blockquote>{post.quote}</blockquote>}
 
-      {post.trackNote && (
-        <div class="denpa-track-card">
-          <div>// SOUNDTRACK LOG · <strong>{post.trackNote.title}</strong></div>
-          <div>CREDIT: {post.trackNote.artist}</div>
-          <div>NOTE: {post.trackNote.note}</div>
-        </div>
-      )}
+        {post.trackNote && (
+          <div class="denpa-track-card">
+            <div>// SOUNDTRACK LOG · <strong>{post.trackNote.title}</strong></div>
+            <div>CREDIT: {post.trackNote.artist}</div>
+            <div>NOTE: {post.trackNote.note}</div>
+          </div>
+        )}
+      </div>
     </div>
 
     <nav class="denpa-article-nav" aria-label="相邻电波记录">
       {prevPost ? (
-        <a href={`/posts/${prevPost.slug}/`}>← {prevPost.routeCode} · {prevPost.title}</a>
+        <a href={`/posts/${prevPost.slug}/`}>← 上一篇：{prevPost.routeCode} · {prevPost.title}</a>
       ) : (
-        <span />
+        <a href="/posts/">← 全部电波记录</a>
       )}
       {nextPost ? (
-        <a href={`/posts/${nextPost.slug}/`}>{nextPost.routeCode} · {nextPost.title} →</a>
+        <a href={`/posts/${nextPost.slug}/`}>下一篇：{nextPost.routeCode} · {nextPost.title} →</a>
       ) : (
-        <span />
+        <a href="/gallery/">前往原画回廊 →</a>
       )}
     </nav>
   </article>

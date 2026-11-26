@@ -1,17 +1,23 @@
 /**
- * 月读电波台 Ambient Engine
- * - Canvas floating lunar bokeh, twinkling 4-point stars, rotating 8-petal lunar emblems & dashed Earth-Moon constellation
- * - Web Audio API synthesized shortwave radio static (((•)) OFF / ON)
+ * 月读电波台 Ambient & Micro-Interaction Engine
+ * - Persistent Canvas starfield, lunar bokeh, rotating 8-petal blossoms & constellation
+ * - Web Audio API synthesized shortwave radio static ((•)) with equalizer & UX toast
  * - Perpetual midnight countdown timer
+ * - Article reading progress hairline, scroll-reveal choreography & back-to-top beacon
+ * - Route filter telemetry, interactive spoiler shield, and exhibition CRT lightbox (←/→ + pure-art mode)
  */
 
-let audioState = {
+const audioState = {
   ctx: null,
   gain: null,
   playing: false,
 };
 
 let canvasStarted = false;
+let countdownInterval = null;
+let toastTimer = null;
+let scrollListenerBound = false;
+let lightboxKeyHandler = null;
 
 export function bootDenpaAtmosphere() {
   if (!canvasStarted) {
@@ -22,12 +28,33 @@ export function bootDenpaAtmosphere() {
     }
   }
 
+  // Always restore CRT scanlines cleanly on page navigation
+  const scanlines = document.querySelector('[data-scanlines]');
+  if (scanlines) scanlines.classList.remove('is-muted');
+
   bindAudioButton();
   bindCountdown();
   bindRouteFilters();
+  bindSpoilerToggle();
   bindGalleryLightbox();
+  bindScrollBehaviors();
+  bindScrollReveals();
 }
 
+function showSignalToast(message) {
+  const el = document.querySelector('[data-denpa-toast]');
+  if (!el) return;
+  el.textContent = message;
+  el.classList.add('is-shown');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.classList.remove('is-shown');
+  }, 2800);
+}
+
+/* --------------------------------------------------------------------------
+   1. Persistent Ambient Canvas
+   -------------------------------------------------------------------------- */
 function mountAmbientCanvas(canvas) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -64,7 +91,6 @@ function mountAmbientCanvas(canvas) {
     };
   });
 
-  // Lunar orbital triangle constellation anchors
   const stars = [
     { x: 0.08, y: 0.44, r: 5.5 },
     { x: 0.18, y: 0.21, r: 4.2 },
@@ -157,20 +183,29 @@ function mountAmbientCanvas(canvas) {
   requestAnimationFrame(render);
 }
 
+/* --------------------------------------------------------------------------
+   2. Web Audio API Shortwave Radio Static Switch + UX Signal Toast
+   -------------------------------------------------------------------------- */
 function bindAudioButton() {
   const btn = document.querySelector('[data-denpa-audio]');
   if (!btn || btn.dataset.bound === '1') return;
   btn.dataset.bound = '1';
 
+  const labelEl = btn.querySelector('[data-audio-label]');
   const syncVisual = () => {
     btn.setAttribute('aria-pressed', String(audioState.playing));
-    btn.textContent = audioState.playing ? '((•)) ON' : '((•)) OFF';
+    if (labelEl) {
+      labelEl.textContent = audioState.playing ? '((•)) ON' : '((•)) OFF';
+    }
   };
   syncVisual();
 
   btn.addEventListener('click', () => {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
+    if (!AudioCtx) {
+      showSignalToast('// AUDIO UNAVAILABLE — 当前浏览器不支持 Web Audio');
+      return;
+    }
 
     if (!audioState.playing) {
       if (!audioState.ctx) {
@@ -212,6 +247,7 @@ function bindAudioButton() {
       audioState.gain.gain.cancelScheduledValues(now);
       audioState.gain.gain.exponentialRampToValueAtTime(0.065, now + 0.35);
       audioState.playing = true;
+      showSignalToast('// TUNED · 8000.00 kHz — 深夜短波底噪已开启');
     } else {
       if (audioState.ctx && audioState.gain) {
         const now = audioState.ctx.currentTime;
@@ -219,12 +255,15 @@ function bindAudioButton() {
         audioState.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
       }
       audioState.playing = false;
+      showSignalToast('// STANDBY — 短波环境底噪已静默');
     }
     syncVisual();
   });
 }
 
-let countdownInterval = null;
+/* --------------------------------------------------------------------------
+   3. Perpetual Countdown Timer
+   -------------------------------------------------------------------------- */
 function bindCountdown() {
   if (countdownInterval) clearInterval(countdownInterval);
   const el = document.querySelector('[data-denpa-countdown]');
@@ -246,50 +285,216 @@ function bindCountdown() {
   countdownInterval = setInterval(tick, 1000);
 }
 
+/* --------------------------------------------------------------------------
+   4. Route Filter with Live Telemetry Counter
+   -------------------------------------------------------------------------- */
 function bindRouteFilters() {
   const buttons = document.querySelectorAll('[data-route-filter]');
   const cards = document.querySelectorAll('[data-post-card]');
+  const countEl = document.querySelector('[data-filter-count]');
   if (!buttons.length || !cards.length) return;
+
+  const total = cards.length;
 
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const target = btn.getAttribute('data-route-filter');
       buttons.forEach((b) => b.classList.toggle('is-active', b === btn));
+      let visible = 0;
       cards.forEach((card) => {
-        const route = card.getAttribute('data-route');
-        card.style.display = target === 'all' || route === target ? '' : 'none';
+        const match = target === 'all' || card.getAttribute('data-route') === target;
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
       });
+      if (countEl) {
+        countEl.textContent = `当前显示 ${visible} / ${total} 条记录`;
+      }
     });
   });
 }
 
+/* --------------------------------------------------------------------------
+   5. Interactive Spoiler Shield (Blur / Reveal Toggle)
+   -------------------------------------------------------------------------- */
+function bindSpoilerToggle() {
+  const toggleBtn = document.querySelector('[data-spoiler-toggle]');
+  const bodyEl = document.querySelector('[data-spoiler-body]');
+  if (!toggleBtn || !bodyEl) return;
+
+  toggleBtn.addEventListener('click', () => {
+    const shielded = bodyEl.classList.toggle('is-shielded');
+    toggleBtn.setAttribute('aria-pressed', String(shielded));
+    toggleBtn.textContent = shielded ? '展开剧透正文' : '暂遮正文';
+    showSignalToast(shielded ? '// SPOILER SHIELD — 已暂遮剧透段落' : '// SPOILER CLEAR — 已展开正文');
+  });
+}
+
+/* --------------------------------------------------------------------------
+   6. Exhibition CRT Darkroom Lightbox (← / → Navigation + Pure Art Mode)
+   -------------------------------------------------------------------------- */
 function bindGalleryLightbox() {
+  if (lightboxKeyHandler) {
+    document.removeEventListener('keydown', lightboxKeyHandler);
+    lightboxKeyHandler = null;
+  }
+
   const box = document.getElementById('denpa-lightbox');
-  const tiles = document.querySelectorAll('[data-lightbox-src]');
+  const tiles = Array.from(document.querySelectorAll('[data-lightbox-src]'));
   if (!box || !tiles.length) return;
 
   const img = box.querySelector('[data-lightbox-img]');
   const fig = box.querySelector('[data-lightbox-fig]');
   const caption = box.querySelector('[data-lightbox-caption]');
+  const counter = box.querySelector('[data-lightbox-counter]');
   const closeBtn = box.querySelector('[data-lightbox-close]');
+  const prevBtn = box.querySelector('[data-lightbox-prev]');
+  const nextBtn = box.querySelector('[data-lightbox-next]');
+  const crtBtn = box.querySelector('[data-lightbox-crt]');
+  const scanlines = document.querySelector('[data-scanlines]');
 
-  const close = () => box.classList.remove('is-open');
+  let currentIdx = 0;
+  let pureArt = false;
 
-  tiles.forEach((tile) => {
-    tile.addEventListener('click', () => {
-      if (img) img.src = tile.getAttribute('data-lightbox-src') || '';
-      if (img) img.alt = tile.getAttribute('data-lightbox-title') || '';
-      if (fig) fig.textContent = tile.getAttribute('data-lightbox-fig') || '';
-      if (caption) caption.textContent = tile.getAttribute('data-lightbox-caption') || '';
-      box.classList.add('is-open');
-    });
+  const pad2 = (n) => String(n).padStart(2, '0');
+
+  const syncCrt = () => {
+    if (crtBtn) {
+      crtBtn.setAttribute('aria-pressed', String(pureArt));
+      crtBtn.textContent = pureArt ? '恢复扫描线' : '纯原画模式';
+    }
+    if (scanlines) {
+      scanlines.classList.toggle('is-muted', pureArt);
+    }
+  };
+
+  const renderAt = (idx) => {
+    currentIdx = (idx + tiles.length) % tiles.length;
+    const tile = tiles[currentIdx];
+    if (img) {
+      img.src = tile.getAttribute('data-lightbox-src') || '';
+      img.alt = tile.getAttribute('data-lightbox-title') || '';
+    }
+    if (fig) fig.textContent = tile.getAttribute('data-lightbox-fig') || '';
+    if (caption) caption.textContent = tile.getAttribute('data-lightbox-caption') || '';
+    if (counter) counter.textContent = `${pad2(currentIdx + 1)} / ${pad2(tiles.length)}`;
+  };
+
+  const openAt = (idx) => {
+    renderAt(idx);
+    box.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const close = () => {
+    box.classList.remove('is-open');
+    document.body.style.overflow = '';
+    if (pureArt) {
+      pureArt = false;
+      syncCrt();
+    }
+  };
+
+  tiles.forEach((tile, idx) => {
+    tile.addEventListener('click', () => openAt(idx));
   });
 
+  if (prevBtn) prevBtn.addEventListener('click', () => renderAt(currentIdx - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => renderAt(currentIdx + 1));
   if (closeBtn) closeBtn.addEventListener('click', close);
+  if (crtBtn) {
+    crtBtn.addEventListener('click', () => {
+      pureArt = !pureArt;
+      syncCrt();
+      showSignalToast(pureArt ? '// PURE ART — 已暂时隐藏 CRT 扫描线' : '// CRT RESTORED — 已恢复复古扫描线');
+    });
+  }
+
   box.addEventListener('click', (e) => {
     if (e.target === box) close();
   });
-  document.addEventListener('keydown', (e) => {
+
+  lightboxKeyHandler = (e) => {
+    if (!box.classList.contains('is-open')) return;
     if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') renderAt(currentIdx - 1);
+    else if (e.key === 'ArrowRight') renderAt(currentIdx + 1);
+  };
+  document.addEventListener('keydown', lightboxKeyHandler);
+}
+
+/* --------------------------------------------------------------------------
+   7. Reading Progress Bar, Scroll Cue & Back-to-Top Beacon
+   -------------------------------------------------------------------------- */
+function updateScrollUI() {
+  const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+
+  const cue = document.querySelector('[data-scroll-cue]');
+  if (cue) {
+    cue.classList.toggle('is-hidden', scrollY > 72);
+  }
+
+  const topBtn = document.querySelector('[data-back-to-top]');
+  if (topBtn) {
+    topBtn.classList.toggle('is-visible', scrollY > 360);
+  }
+
+  const progressBar = document.querySelector('[data-reading-progress]');
+  if (progressBar) {
+    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const ratio = Math.min(1, Math.max(0, scrollY / maxScroll));
+    progressBar.style.transform = `scaleX(${ratio})`;
+  }
+}
+
+function bindScrollBehaviors() {
+  if (!scrollListenerBound) {
+    scrollListenerBound = true;
+    window.addEventListener('scroll', updateScrollUI, { passive: true });
+    window.addEventListener('resize', updateScrollUI, { passive: true });
+  }
+  updateScrollUI();
+
+  const topBtn = document.querySelector('[data-back-to-top]');
+  if (topBtn && topBtn.dataset.bound !== '1') {
+    topBtn.dataset.bound = '1';
+    topBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. Subtle Scroll-Reveal Choreography
+   -------------------------------------------------------------------------- */
+function bindScrollReveals() {
+  const els = document.querySelectorAll('[data-reveal]');
+  if (!els.length) return;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducedMotion || typeof IntersectionObserver === 'undefined') {
+    els.forEach((el) => el.classList.add('is-visible'));
+    return;
+  }
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('is-pending');
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.08, rootMargin: '0px 0px -30px 0px' }
+  );
+
+  els.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.92) {
+      el.classList.add('is-visible');
+    } else {
+      el.classList.add('is-pending');
+      io.observe(el);
+    }
   });
 }

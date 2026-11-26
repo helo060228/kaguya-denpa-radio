@@ -23,11 +23,41 @@ export const SITE = {
     '改写竹取物语的结局',
   ],
   discography: [
-    { title: '前尘物语 (Ex-Otogibanashi)', meta: 'ryo (supercell) · 主题曲' },
-    { title: '答覆 (Reply)', meta: 'kz (livetune) · 辉夜 插曲' },
-    { title: '我，好我者也。', meta: 'HoneyWorks · 辉夜 插曲' },
-    { title: '瞬、交响。', meta: '40mP · 辉夜 插曲' },
-    { title: '星降之海 (Starry Sea)', meta: 'Aqu3ra · 月见八千代 插曲' },
-    { title: '忆昔 (Remember)', meta: 'yuigot · 月见八千代 插曲' },
+    {
+      title: '前尘物语 (Ex-Otogibanashi)',
+      meta: 'ryo (supercell) · 主题曲',
+      href: '/posts/vocaloid-constellation/',
+      routeHint: 'ROUTE 03 乐评',
+    },
+    {
+      title: '答覆 (Reply)',
+      meta: 'kz (livetune) · 辉夜 插曲',
+      href: '/posts/vocaloid-constellation/',
+      routeHint: 'ROUTE 03 乐评',
+    },
+    {
+      title: '我，好我者也。',
+      meta: 'HoneyWorks · 辉夜 插曲',
+      href: '/posts/tsukuyomi-debut/',
+      routeHint: 'ROUTE 02 舞台记',
+    },
+    {
+      title: '瞬、交响。',
+      meta: '40mP · 辉夜 插曲',
+      href: '/posts/tsukuyomi-debut/',
+      routeHint: 'ROUTE 02 舞台记',
+    },
+    {
+      title: '星降之海 (Starry Sea)',
+      meta: 'Aqu3ra · 月见八千代 插曲',
+      href: '/posts/vocaloid-constellation/',
+      routeHint: 'ROUTE 03 乐评',
+    },
+    {
+      title: '忆昔 (Remember)',
+      meta: 'yuigot · 月见八千代 插曲',
+      href: '/posts/eight-thousand-years/',
+      routeHint: 'ROUTE 05 守望录',
+    },
   ],
 };

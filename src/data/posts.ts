@@ -4,6 +4,8 @@ export interface DenpaPost {
   routeCode: string;
   routeSubtitle: string;
   date: string;
+  readTime: string;
+  frequency: string;
   title: string;
   excerpt: string;
   tags: string[];
@@ -26,6 +28,8 @@ export const POSTS: DenpaPost[] = [
     routeCode: 'ROUTE 01',
     routeSubtitle: '发光的电线杆',
     date: '2026.01.22',
+    readTime: '约 2 分钟',
+    frequency: '101.40 MHz',
     title: '深夜东京的七彩竹取',
     excerpt: '一根在近未来东京街头泛起七彩微光的电线杆，替古老的竹林接过了最初的电波。',
     tags: ['#酒寄彩叶', '#电线杆', '#初遇'],
@@ -44,6 +48,8 @@ export const POSTS: DenpaPost[] = [
     routeCode: 'ROUTE 02',
     routeSubtitle: '月读初配信',
     date: '2026.01.28',
+    readTime: '约 2 分钟',
+    frequency: '102.15 MHz',
     title: '彩P与任性公主的舞台',
     excerpt: '一个抱着肩背键盘编曲，一个举起麦克风放声歌唱——虚拟空间「月读」里最耀眼的搭档。',
     tags: ['#月读', '#彩P', '#虚拟直播'],
@@ -66,6 +72,8 @@ export const POSTS: DenpaPost[] = [
     routeCode: 'ROUTE 03',
     routeSubtitle: '殿堂级曲目志',
     date: '2026.02.04',
+    readTime: '约 3 分钟',
+    frequency: '104.80 MHz',
     title: '从〈前尘物语〉到〈ray〉',
     excerpt: '当 ryo、kz、40mP、Aqu3ra、yuigot 与 HoneyWorks 在同一片夜空交汇。',
     tags: ['#ryo', '#ray', '#歌单考据'],
@@ -88,6 +96,8 @@ export const POSTS: DenpaPost[] = [
     routeCode: 'ROUTE 04',
     routeSubtitle: '满月与折返',
     date: '2026.02.14',
+    readTime: '约 2 分钟',
+    frequency: '106.20 MHz',
     title: '拒绝悲剧结局的月圆之夜',
     excerpt: '来自月球的阴影终究降临，但这一次，她听到那首歌后转过了飞船的航向。',
     tags: ['#满月', '#告别', '#逆转命运'],
@@ -107,6 +117,8 @@ export const POSTS: DenpaPost[] = [
     routeCode: 'ROUTE 05',
     routeSubtitle: '八千年闭环',
     date: '2026.02.20',
+    readTime: '约 3 分钟',
+    frequency: '8000.00 kHz',
     title: '月见八千代的漫长守望',
     excerpt: '坠落回八千年前的少女，把思念写进《竹取物语》，又在信息时代筑起了整座「月读」。',
     tags: ['#月见八千代', '#八千年', '#机械义体'],
