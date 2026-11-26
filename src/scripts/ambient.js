@@ -763,7 +763,7 @@ function bindRouteFilters() {
         card.style.display = match ? '' : 'none';
         if (match) visible++;
       });
-      if (countEl) countEl.textContent = `当前显示 ${visible} / ${total} 条记录`;
+      if (countEl) countEl.textContent = `当前显示 ${visible} / ${total} 篇放送录`;
     });
   });
 }

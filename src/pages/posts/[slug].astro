@@ -39,7 +39,7 @@ const routeVar = `var(--route-${post.routeNum})`;
 >
   <article style={`--route-accent: ${routeVar};`}>
     <header class="denpa-article-header">
-      <a class="denpa-back-link" href="/posts/">← 返回电波记录列表</a>
+      <a class="denpa-back-link" href="/posts/">← 返回放送录列表</a>
       <div class="denpa-article-date">
         {post.date} · {post.readTime} · {post.frequency}
       </div>
@@ -97,11 +97,11 @@ const routeVar = `var(--route-${post.routeNum})`;
       </div>
     </div>
 
-    <nav class="denpa-article-nav" aria-label="相邻电波记录">
+    <nav class="denpa-article-nav" aria-label="相邻放送录">
       {prevPost ? (
         <a href={`/posts/${prevPost.slug}/`}>← 上一篇：{prevPost.routeCode} · {prevPost.title}</a>
       ) : (
-        <a href="/posts/">← 全部电波记录</a>
+        <a href="/posts/">← 全部放送录</a>
       )}
       {nextPost ? (
         <a href={`/posts/${nextPost.slug}/`}>下一篇：{nextPost.routeCode} · {nextPost.title} →</a>

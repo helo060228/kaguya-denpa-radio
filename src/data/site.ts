@@ -8,7 +8,7 @@ export const SITE = {
     '© 同人爱好者的个人小站 · 致敬《超かぐや姫！》Studio Colorido / STUDIO CHROMATO · 仅作个人欣赏',
   nav: [
     { label: '首页', href: '/' },
-    { label: '电波记录', href: '/posts/' },
+    { label: '放送录', href: '/posts/' },
     { label: '人物', href: '/characters/' },
     { label: '时间线', href: '/timeline/' },
     { label: '回廊', href: '/gallery/' },
