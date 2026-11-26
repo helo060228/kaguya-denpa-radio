@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { GALLERY_PLATES } from '../data/gallery';
+---
+
+<BaseLayout
+  title="回廊"
+  activeNav="/gallery/"
+  backdrop="/images/route-05-pavilion.jpg"
+>
+  <section class="denpa-container" style="padding-top: 44px; padding-bottom: 40px;">
+    <div class="denpa-section-header">
+      <div class="denpa-section-header-left">
+        <h1 class="denpa-section-title">回廊</h1>
+        <span class="denpa-section-en">GALLERY</span>
+      </div>
+      <span class="denpa-section-more">CLICK PLATE TO INSPECT</span>
+    </div>
+
+    <div class="denpa-grid-3">
+      {GALLERY_PLATES.map((plate) => (
+        <button
+          id={plate.id}
+          type="button"
+          class="denpa-gallery-tile"
+          data-lightbox-src={plate.src}
+          data-lightbox-fig={`${plate.fig} — ${plate.title}`}
+          data-lightbox-title={plate.title}
+          data-lightbox-caption={plate.caption}
+        >
+          <img src={plate.src} alt={plate.title} loading="lazy" />
+          <div class="denpa-gallery-overlay">
+            <span class="denpa-gallery-fig">{plate.fig}</span>
+            <span class="denpa-gallery-label">{plate.title}</span>
+          </div>
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <!-- Minimal CRT Darkroom Lightbox -->
+  <div id="denpa-lightbox" class="denpa-lightbox" role="dialog" aria-modal="true" aria-label="画面详情">
+    <div class="denpa-lightbox-inner">
+      <button type="button" class="denpa-lightbox-close" data-lightbox-close>ESC / CLOSE</button>
+      <img data-lightbox-img src="" alt="" />
+      <div class="denpa-lightbox-meta">
+        <span class="denpa-gallery-fig" data-lightbox-fig></span>
+        <span style="font-size: 0.84rem; color: var(--text-body);" data-lightbox-caption></span>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

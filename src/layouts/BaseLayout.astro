@@ -1,0 +1,122 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import { SITE } from '../data/site';
+import '../styles/denpa.css';
+
+interface Props {
+  title: string;
+  activeNav: string;
+  backdrop?: string;
+}
+
+const {
+  title,
+  activeNav,
+  backdrop = '/images/backdrop-main.jpg',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="月读电波台 — 《超时空辉夜姬！》（超かぐや姫！）二次元深夜电波风 Astro 同人档案站" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} · {SITE.title}</title>
+    <link rel="preconnect" href="https://fonts.loli.net" />
+    <link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
+    <link
+      href="https://fonts.loli.net/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <ClientRouter />
+  </head>
+  <body>
+    <!-- Layer -3 & -2: Full-Bleed Dimmed CG Backdrop + Radial Dark Vignette -->
+    <div class="denpa-backdrop" style={`background-image: url('${backdrop}');`}></div>
+    <div class="denpa-vignette" aria-hidden="true"></div>
+
+    <!-- Layer -1: Persistent Ambient Canvas (Survives Route Transitions) -->
+    <canvas id="denpa-ambient" class="denpa-ambient-canvas" aria-hidden="true" transition:persist="denpa-canvas"></canvas>
+
+    <!-- Layer 40: Sticky Translucent Top Navigation -->
+    <header class="denpa-nav">
+      <a class="denpa-brand" href="/">
+        <svg class="denpa-brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <g transform="translate(12 12)">
+            <ellipse rx="1.6" ry="4.6" cy="-6" />
+            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(45)" />
+            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(90)" />
+            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(135)" />
+            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(180)" />
+            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(225)" />
+            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(270)" />
+            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(315)" />
+            <circle r="2.2" fill="#fff2cc" />
+          </g>
+        </svg>
+        <span>{SITE.title}</span>
+      </a>
+
+      <nav class="denpa-nav-right" aria-label="主导航">
+        <ul class="denpa-nav-links">
+          {SITE.nav.map((item) => (
+            <li>
+              <a
+                class:list={['denpa-nav-link', { 'is-active': activeNav === item.href }]}
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          class="denpa-audio-btn"
+          data-denpa-audio
+          aria-pressed="false"
+          title="开关短波电波背景噪声"
+          transition:persist="denpa-audio"
+        >
+          ((•)) OFF
+        </button>
+      </nav>
+    </header>
+
+    <!-- Layer 1: Page Content -->
+    <main>
+      <slot />
+    </main>
+
+    <!-- Radio Frequency Colophon Footer -->
+    <footer class="denpa-footer">
+      <div>{SITE.copyright}</div>
+      <div class="denpa-footer-signal">{SITE.frequency}</div>
+    </footer>
+
+    <!-- Layer 45: Fixed Bottom Infinite Marquee -->
+    <aside class="denpa-marquee" aria-label="电波跑马灯" transition:persist="denpa-marquee">
+      <div class="denpa-marquee-track">
+        {SITE.marquee.map((phrase) => (
+          <span class="denpa-marquee-item">{phrase}</span>
+        ))}
+        {SITE.marquee.map((phrase) => (
+          <span class="denpa-marquee-item" aria-hidden="true">{phrase}</span>
+        ))}
+      </div>
+    </aside>
+
+    <!-- Layer 50: Global CRT Scanlines -->
+    <div class="denpa-scanlines" aria-hidden="true"></div>
+
+    <script>
+      import { bootDenpaAtmosphere } from '../scripts/ambient.js';
+      document.addEventListener('astro:page-load', () => {
+        bootDenpaAtmosphere();
+      });
+    </script>
+  </body>
+</html>

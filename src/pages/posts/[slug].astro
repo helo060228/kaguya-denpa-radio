@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { POSTS, type DenpaPost } from '../../data/posts';
+
+export function getStaticPaths() {
+  return POSTS.map((post, idx) => ({
+    params: { slug: post.slug },
+    props: {
+      post,
+      prevPost: idx > 0 ? POSTS[idx - 1] : null,
+      nextPost: idx < POSTS.length - 1 ? POSTS[idx + 1] : null,
+    },
+  }));
+}
+
+interface Props {
+  post: DenpaPost;
+  prevPost: DenpaPost | null;
+  nextPost: DenpaPost | null;
+}
+
+const { post, prevPost, nextPost } = Astro.props;
+const routeVar = `var(--route-${post.routeNum})`;
+---
+
+<BaseLayout
+  title={post.title}
+  activeNav="/posts/"
+  backdrop={post.backdrop}
+>
+  <article style={`--route-accent: ${routeVar};`}>
+    <header class="denpa-article-header">
+      <a class="denpa-back-link" href="/posts/">← RETURN TO TRANSMISSIONS</a>
+      <div class="denpa-article-date">{post.date}</div>
+      <h1 class="denpa-article-title">{post.title}</h1>
+      <div class="denpa-article-route">
+        {post.routeCode} · {post.routeSubtitle}
+      </div>
+      <div class="denpa-tags">
+        {post.tags.map((tag) => (
+          <span class="denpa-tag">{tag}</span>
+        ))}
+      </div>
+    </header>
+
+    <div class="denpa-prose">
+      {post.spoiler && (
+        <aside class="denpa-spoiler-box" role="note">
+          <span aria-hidden="true">⚠</span>
+          <span>内含核心剧情反转相关的感想，介意请先观看原作《超时空辉夜姬！》。</span>
+        </aside>
+      )}
+
+      {post.paragraphs.map((html) => (
+        <p set:html={html} />
+      ))}
+
+      {post.quote && <blockquote>{post.quote}</blockquote>}
+
+      {post.trackNote && (
+        <div class="denpa-track-card">
+          <div>// SOUNDTRACK LOG · <strong>{post.trackNote.title}</strong></div>
+          <div>CREDIT: {post.trackNote.artist}</div>
+          <div>NOTE: {post.trackNote.note}</div>
+        </div>
+      )}
+    </div>
+
+    <nav class="denpa-article-nav" aria-label="相邻电波记录">
+      {prevPost ? (
+        <a href={`/posts/${prevPost.slug}/`}>← {prevPost.routeCode} · {prevPost.title}</a>
+      ) : (
+        <span />
+      )}
+      {nextPost ? (
+        <a href={`/posts/${nextPost.slug}/`}>{nextPost.routeCode} · {nextPost.title} →</a>
+      ) : (
+        <span />
+      )}
+    </nav>
+  </article>
+</BaseLayout>

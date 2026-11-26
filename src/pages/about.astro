@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../data/site';
+---
+
+<BaseLayout
+  title="关于"
+  activeNav="/about/"
+  backdrop="/images/route-05-pavilion.jpg"
+>
+  <section class="denpa-container" style="padding-top: 48px; padding-bottom: 40px;">
+    <div class="denpa-section-header">
+      <div class="denpa-section-header-left">
+        <h1 class="denpa-section-title">关于这座电波台</h1>
+        <span class="denpa-section-en">ABOUT</span>
+      </div>
+    </div>
+
+    <div class="denpa-about-grid">
+      <div class="denpa-about-art">
+        <img src="/images/about-triptych.jpg" alt="超时空辉夜姬官方角色三联画" />
+      </div>
+
+      <div class="denpa-about-copy">
+        <p>
+          《超时空辉夜姬！》（超かぐや姫！ / Cosmic Princess Kaguya!）是由山下清悟执导，Studio Colorido 与 STUDIO CHROMATO 联合打造的原创长篇动画电影，于 2026 年 1 月 22 日上线。它以近未来东京与虚拟空间「月读」为舞台，将古老的《竹取物语》改写为一段跨越八千年的重逢物语。
+        </p>
+        <p>
+          这个小站是一个爱好者的私人收藏夹：一些在深夜回味时留下的画面、几篇关于辉夜、酒寄彩叶与月见八千代的笔记。没有攻略，也没有评分，只有电波。
+        </p>
+
+        <ul class="denpa-colophon">
+          <li>原作：超かぐや姫！ / 山下清悟 · 夏生さえり</li>
+          <li>制作：Studio Colorido × STUDIO CHROMATO</li>
+          <li>声优：夏吉优子（辉夜）· 永濑安奈（酒寄彩叶）· 早见沙织（月见八千代）</li>
+          <li>技术：Astro · 纯静态 · 无追踪</li>
+          <li>提示：右上角 ((•)) 可以打开电波噪声。</li>
+        </ul>
+
+        <div class="denpa-discography">
+          <h2 class="denpa-discography-title">// BROADCAST PLAYLIST · 收录曲目志</h2>
+          <div class="denpa-discography-grid">
+            {SITE.discography.map((track) => (
+              <div class="denpa-disc-item">
+                <span class="denpa-disc-name">{track.title}</span>
+                <span class="denpa-disc-meta">{track.meta}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

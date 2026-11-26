@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { POSTS } from '../data/posts';
+import { GALLERY_PLATES } from '../data/gallery';
+
+const latestPosts = POSTS.slice(0, 3);
+const previewGallery = GALLERY_PLATES.slice(0, 3);
+---
+
+<BaseLayout
+  title="首页"
+  activeNav="/"
+  backdrop="/images/backdrop-main.jpg"
+>
+  <!-- Act 1: Asymmetric Editorial Hero -->
+  <section class="denpa-container denpa-hero">
+    <div>
+      <p class="denpa-eyebrow">// TRANSMISSION RECEIVED · 2026.01.22</p>
+      <h1 class="denpa-hero-title">超时空辉夜姬</h1>
+      <p class="denpa-hero-lead">
+        这里是一座建在虚拟空间「月读」边缘的小小电波台。收录关于《超かぐや姫！》的图、曲目笔记，以及跨越八千年依然在寻找回音的讯号。
+      </p>
+
+      <div class="denpa-countdown-block">
+        <div class="denpa-countdown-row">
+          <span>距离下次月圆重逢还有</span>
+          <span class="denpa-countdown-digits" data-denpa-countdown>06:20:27</span>
+        </div>
+        <p class="denpa-countdown-note">（跨越八千年，它终究不会停在零）</p>
+      </div>
+
+      <div class="denpa-actions">
+        <a class="denpa-btn-primary" href="/posts/">
+          <span>▶ 开始收听</span>
+        </a>
+        <a class="denpa-btn-ghost" href="/gallery/">进入回廊</a>
+      </div>
+    </div>
+
+    <figure class="denpa-hero-plate-wrap">
+      <div class="denpa-hero-plate">
+        <img src="/images/hero-portrait.jpg" alt="星轨之下的钢琴与歌声" />
+      </div>
+      <figcaption class="denpa-plate-caption">FIG.01 — 星轨之下的钢琴与歌声</figcaption>
+    </figure>
+  </section>
+
+  <!-- Act 2: Full-Bleed Floating Poetic Quote Interlude (No Card Box) -->
+  <section class="denpa-interlude">
+    <blockquote class="denpa-interlude-quote">
+      「哪怕坠落回 <span class="hl-gold">8000年前</span>，也要为你筑起一座月读。」<br />
+      「那么，这一次，让我们改写竹取物语的结局吧。」
+    </blockquote>
+    <p class="denpa-interlude-source">— 东京深夜，发光的电线杆之下</p>
+  </section>
+
+  <!-- Act 3: Latest Transmissions Preview -->
+  <section class="denpa-container denpa-section-block">
+    <div class="denpa-section-header">
+      <div class="denpa-section-header-left">
+        <h2 class="denpa-section-title">电波记录</h2>
+        <span class="denpa-section-en">TRANSMISSIONS</span>
+      </div>
+      <a class="denpa-section-more" href="/posts/">ALL 05 ROUTES →</a>
+    </div>
+
+    <div class="denpa-grid-3">
+      {latestPosts.map((post) => (
+        <a class="denpa-card" data-route={String(post.routeNum)} href={`/posts/${post.slug}/`}>
+          <div class="denpa-card-thumb">
+            <img src={post.cover} alt={post.title} loading="lazy" />
+          </div>
+          <div class="denpa-card-body">
+            <div class="denpa-card-meta">
+              {post.date} // {post.routeCode} · {post.routeSubtitle}
+            </div>
+            <h3 class="denpa-card-title">{post.title}</h3>
+            <div class="denpa-tags">
+              {post.tags.map((tag) => (
+                <span class="denpa-tag">{tag}</span>
+              ))}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Act 4: Gallery Preview -->
+  <section class="denpa-container denpa-section-block">
+    <div class="denpa-section-header">
+      <div class="denpa-section-header-left">
+        <h2 class="denpa-section-title">回廊</h2>
+        <span class="denpa-section-en">GALLERY</span>
+      </div>
+      <a class="denpa-section-more" href="/gallery/">ENTER ARCHIVE →</a>
+    </div>
+
+    <div class="denpa-grid-3">
+      {previewGallery.map((plate) => (
+        <a class="denpa-gallery-tile" href={`/gallery/#${plate.id}`}>
+          <img src={plate.src} alt={plate.title} loading="lazy" />
+          <div class="denpa-gallery-overlay">
+            <span class="denpa-gallery-fig">{plate.fig}</span>
+            <span class="denpa-gallery-label">{plate.title}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,1128 @@
+/* ==========================================================================
+   月读电波台 · 《超时空辉夜姬！》同人档案站
+   Based on anime-denpa-radio-web Design System
+   ========================================================================== */
+
+:root {
+  /* --- Void & Midnight Surfaces --- */
+  --bg-void: #040613;
+  --bg-midnight: #080b1c;
+  --bg-indigo-bloom: #101638;
+  --bg-surface: rgba(11, 15, 38, 0.78);
+  --bg-surface-hover: rgba(17, 23, 56, 0.88);
+  --bg-chrome: rgba(5, 6, 15, 0.92);
+
+  /* --- Typography Inks --- */
+  --text-ivory: #ebe3da;
+  --text-primary: #e4e6f2;
+  --text-body: #c0c6da;
+  --text-muted: #7f88a3;
+  --text-dim: #5b6480;
+
+  /* --- Signature Accents (Lunar Gold × Tsukuyomi Cyan × Twilight Rose) --- */
+  --accent-gold: #d4af4c;
+  --accent-gold-bright: #e7c872;
+  --accent-gold-dim: #a08544;
+  --accent-cyan: #70b8ce;
+  --accent-cyan-bright: #8ad3e8;
+  --accent-rose: #c9647d;
+  --accent-rose-soft: #d77a90;
+
+  /* --- Per-Route Semantic Accents --- */
+  --route-1: #c8a951; /* ROUTE 01 · 发光的电线杆 (琥珀金) */
+  --route-2: #d49b4b; /* ROUTE 02 · 月读初配信 (暮色赭) */
+  --route-3: #66b3c9; /* ROUTE 03 · 殿堂级曲目志 (信号青) */
+  --route-4: #c86484; /* ROUTE 04 · 满月与折返 (黯玫瑰) */
+  --route-5: #7c8fd6; /* ROUTE 05 · 八千年闭环 (星光靛) */
+
+  /* --- Borders & Dividers --- */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-tag: rgba(255, 255, 255, 0.13);
+  --border-gold: rgba(212, 175, 76, 0.44);
+  --border-gold-faint: rgba(212, 175, 76, 0.20);
+  --border-cyan-dash: rgba(112, 184, 206, 0.32);
+  --border-rose-dash: rgba(212, 119, 140, 0.46);
+
+  /* --- Typography Families --- */
+  --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', Georgia, serif;
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', ui-monospace, monospace;
+
+  /* --- Layout & Chrome Dimensions --- */
+  --nav-height: 60px;
+  --marquee-height: 30px;
+  --container-max: 1120px;
+  --prose-max: 720px;
+
+  /* --- Atmosphere Controls --- */
+  --backdrop-opacity: 0.28;
+  --scanline-alpha: 0.20;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--bg-void);
+  background-image: radial-gradient(ellipse at 50% 22%, var(--bg-indigo-bloom) 0%, var(--bg-midnight) 44%, var(--bg-void) 100%);
+  background-attachment: fixed;
+  color: var(--text-body);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: transparent;
+  padding-top: var(--nav-height);
+  padding-bottom: calc(var(--marquee-height) + 28px);
+  overflow-x: hidden;
+  position: relative;
+}
+
+main,
+.denpa-footer {
+  position: relative;
+  z-index: 10;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   Atmospheric Viewport Layers
+   ========================================================================== */
+
+.denpa-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: var(--backdrop-opacity);
+  filter: saturate(0.88) contrast(1.06);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.denpa-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(6, 9, 24, 0.20) 0%, rgba(4, 6, 19, 0.72) 72%, rgba(3, 4, 12, 0.92) 100%),
+    linear-gradient(to bottom, rgba(4, 6, 19, 0.76) 0%, transparent 18%, transparent 78%, rgba(4, 6, 19, 0.90) 100%);
+}
+
+.denpa-ambient-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.denpa-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, var(--scanline-alpha)) 2px,
+    rgba(0, 0, 0, var(--scanline-alpha)) 4px
+  );
+}
+
+/* ==========================================================================
+   Top Navigation Bar + Radio Static Toggle ((•))
+   ========================================================================== */
+
+.denpa-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 48px);
+  background: linear-gradient(to bottom, rgba(4, 6, 19, 0.94) 0%, rgba(4, 6, 19, 0.56) 72%, transparent 100%);
+  backdrop-filter: blur(4px);
+}
+
+.denpa-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-gold);
+  transition: color 0.25s ease;
+}
+
+.denpa-brand:hover {
+  color: var(--accent-gold-bright);
+}
+
+.denpa-brand-icon {
+  width: 19px;
+  height: 19px;
+  color: var(--accent-gold);
+  filter: drop-shadow(0 0 6px rgba(212, 175, 76, 0.50));
+}
+
+.denpa-nav-right {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 32px);
+}
+
+.denpa-nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.2vw, 28px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.denpa-nav-link {
+  position: relative;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 6px 2px;
+  transition: color 0.25s ease;
+}
+
+.denpa-nav-link:hover {
+  color: var(--text-primary);
+}
+
+.denpa-nav-link.is-active {
+  color: var(--accent-gold-bright);
+}
+
+.denpa-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: var(--accent-gold);
+  box-shadow: 0 0 8px rgba(212, 175, 76, 0.6);
+}
+
+.denpa-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 2px;
+  background: rgba(8, 11, 28, 0.58);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.denpa-audio-btn:hover {
+  border-color: var(--border-gold);
+  color: var(--text-primary);
+}
+
+.denpa-audio-btn[aria-pressed="true"] {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.12);
+  box-shadow: 0 0 14px rgba(212, 175, 76, 0.28);
+}
+
+/* ==========================================================================
+   Layout Container & Section Headers
+   ========================================================================== */
+
+.denpa-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px);
+}
+
+.denpa-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 12px;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.denpa-section-header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.denpa-section-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(to right, rgba(212, 175, 76, 0.45), rgba(212, 175, 76, 0.08) 55%, transparent 100%);
+}
+
+.denpa-section-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 2.2vw, 1.65rem);
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  color: var(--accent-gold);
+}
+
+.denpa-section-en {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.denpa-section-more {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  transition: color 0.25s ease;
+}
+
+.denpa-section-more:hover {
+  color: var(--accent-gold-bright);
+}
+
+/* ==========================================================================
+   Hero Section
+   ========================================================================== */
+
+.denpa-hero {
+  min-height: calc(100vh - var(--nav-height) - var(--marquee-height));
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 72px);
+  padding: clamp(32px, 5vh, 56px) 0;
+}
+
+.denpa-eyebrow {
+  margin: 0 0 18px;
+  font-family: var(--font-mono);
+  font-size: 0.80rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+}
+
+.denpa-hero-title {
+  margin: 0 0 22px;
+  font-family: var(--font-serif);
+  font-size: clamp(2.45rem, 5.2vw, 4.15rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.08em;
+  color: var(--text-ivory);
+  text-shadow:
+    2px 1px 0 rgba(219, 105, 130, 0.56),
+   -1px -1px 0 rgba(112, 184, 206, 0.24),
+    0 0 32px rgba(212, 175, 76, 0.15);
+}
+
+.denpa-hero-lead {
+  margin: 0 0 30px;
+  max-width: 48ch;
+  font-size: 0.95rem;
+  line-height: 1.95;
+  color: var(--text-body);
+}
+
+.denpa-countdown-block {
+  border-left: 2px solid var(--accent-rose);
+  padding: 4px 0 4px 16px;
+  margin-bottom: 34px;
+}
+
+.denpa-countdown-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.denpa-countdown-digits {
+  font-family: var(--font-mono);
+  font-size: 1.38rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-gold-bright);
+  text-shadow: 0 0 14px rgba(212, 175, 76, 0.34);
+}
+
+.denpa-countdown-note {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.denpa-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.denpa-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 24px;
+  background: var(--accent-gold);
+  color: #070914;
+  border: 1px solid var(--accent-gold);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  transform: skewX(-8deg);
+  cursor: pointer;
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.denpa-btn-primary > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transform: skewX(8deg);
+}
+
+.denpa-btn-primary:hover {
+  background: var(--accent-gold-bright);
+  box-shadow: 0 0 24px rgba(212, 175, 76, 0.40);
+  transform: skewX(-8deg) translateY(-1px);
+}
+
+.denpa-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 22px;
+  background: rgba(8, 11, 28, 0.45);
+  color: var(--accent-gold);
+  border: 1px solid var(--border-gold);
+  border-radius: 1px;
+  font-size: 0.875rem;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.denpa-btn-ghost:hover {
+  background: rgba(212, 175, 76, 0.12);
+  border-color: var(--accent-gold-bright);
+  color: var(--accent-gold-bright);
+}
+
+/* Right Tilted Blueprint Plate */
+.denpa-hero-plate-wrap {
+  position: relative;
+  justify-self: center;
+  width: min(100%, 340px);
+  padding: 18px;
+  margin: 0;
+}
+
+.denpa-hero-plate-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px dashed var(--border-cyan-dash);
+  transform: rotate(2.4deg);
+  pointer-events: none;
+}
+
+.denpa-hero-plate {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 764 / 1080;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.62);
+  background: #07091a;
+}
+
+.denpa-hero-plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.denpa-plate-caption {
+  margin-top: 10px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   Full-Bleed Poetic Quote Interlude
+   ========================================================================== */
+
+.denpa-interlude {
+  padding: clamp(76px, 14vh, 148px) 20px;
+  text-align: center;
+}
+
+.denpa-interlude-quote {
+  margin: 0 auto;
+  max-width: 960px;
+  font-family: var(--font-serif);
+  font-size: clamp(1.22rem, 2.35vw, 1.86rem);
+  font-weight: 400;
+  line-height: 2.15;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  text-shadow: 0 2px 24px rgba(4, 6, 19, 0.92);
+}
+
+.denpa-interlude-quote .hl-gold {
+  color: var(--accent-gold-bright);
+}
+
+.denpa-interlude-source {
+  margin-top: 22px;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Archival Cards Grid & Gallery Grid
+   ========================================================================== */
+
+.denpa-section-block {
+  padding: 24px 0 64px;
+}
+
+.denpa-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.denpa-card {
+  --card-accent: var(--route-1);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+  transition: border-color 0.28s ease, box-shadow 0.28s ease, transform 0.28s ease, background 0.28s ease;
+}
+
+.denpa-card[data-route="1"] { --card-accent: var(--route-1); }
+.denpa-card[data-route="2"] { --card-accent: var(--route-2); }
+.denpa-card[data-route="3"] { --card-accent: var(--route-3); }
+.denpa-card[data-route="4"] { --card-accent: var(--route-4); }
+.denpa-card[data-route="5"] { --card-accent: var(--route-5); }
+
+.denpa-card:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--card-accent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--card-accent) 30%, transparent);
+  transform: translateY(-2px);
+}
+
+.denpa-card-thumb {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  overflow: hidden;
+  background: #060816;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.denpa-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.55s ease;
+}
+
+.denpa-card:hover .denpa-card-thumb img {
+  transform: scale(1.035);
+}
+
+.denpa-card-body {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.denpa-card-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--card-accent);
+}
+
+.denpa-card-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+
+.denpa-card-excerpt {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.denpa-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.denpa-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--border-tag);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* Route Filter Row */
+.denpa-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.denpa-filter-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--border-tag);
+  border-radius: 2px;
+  background: rgba(8, 11, 28, 0.55);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color 0.22s ease, color 0.22s ease, background 0.22s ease;
+}
+
+.denpa-filter-btn:hover,
+.denpa-filter-btn.is-active {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.10);
+}
+
+/* Gallery Tiles */
+.denpa-gallery-tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  background: #060816;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.denpa-gallery-tile:hover {
+  border-color: var(--border-gold);
+  box-shadow: 0 0 20px rgba(212, 175, 76, 0.22);
+}
+
+.denpa-gallery-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.55s ease;
+}
+
+.denpa-gallery-tile:hover img {
+  transform: scale(1.04);
+}
+
+.denpa-gallery-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 24px 14px 12px;
+  background: linear-gradient(to top, rgba(4, 6, 19, 0.90) 0%, transparent 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.denpa-gallery-fig {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-gold);
+}
+
+.denpa-gallery-label {
+  font-family: var(--font-serif);
+  font-size: 0.84rem;
+  color: var(--text-primary);
+}
+
+/* Minimal CRT Lightbox */
+.denpa-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: rgba(3, 4, 12, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.denpa-lightbox.is-open {
+  display: flex;
+}
+
+.denpa-lightbox-inner {
+  max-width: min(960px, 94vw);
+  width: 100%;
+  border: 1px solid var(--border-gold);
+  background: #060918;
+  padding: 16px;
+  position: relative;
+}
+
+.denpa-lightbox-inner img {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  display: block;
+  background: #040613;
+}
+
+.denpa-lightbox-meta {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.denpa-lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-tag);
+  background: rgba(4, 6, 19, 0.85);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Article Reading Page
+   ========================================================================== */
+
+.denpa-article-header {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: clamp(48px, 11vh, 110px) clamp(20px, 4vw, 48px) 32px;
+}
+
+.denpa-back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  transition: color 0.25s ease;
+}
+
+.denpa-back-link:hover {
+  color: var(--accent-gold-bright);
+}
+
+.denpa-article-date {
+  font-family: var(--font-mono);
+  font-size: 0.80rem;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.denpa-article-title {
+  margin: 0 0 14px;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4.4vw, 3.05rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-ivory);
+}
+
+.denpa-article-route {
+  display: inline-block;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  letter-spacing: 0.10em;
+  color: var(--route-accent, var(--accent-cyan));
+}
+
+.denpa-prose {
+  max-width: var(--prose-max);
+  margin: 0 auto;
+  padding: 20px clamp(20px, 4vw, 32px) 48px;
+  font-size: 1rem;
+  line-height: 2.05;
+  letter-spacing: 0.03em;
+  color: var(--text-body);
+}
+
+.denpa-prose p {
+  margin: 0 0 1.7em;
+}
+
+.denpa-prose .hl-route {
+  color: var(--route-accent, var(--accent-cyan-bright));
+}
+
+.denpa-prose blockquote {
+  margin: 2.2em 0;
+  padding: 6px 0 6px 20px;
+  border-left: 2px solid var(--route-accent, var(--accent-gold));
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+  color: var(--text-primary);
+}
+
+.denpa-spoiler-box {
+  margin: 0 0 38px;
+  padding: 14px 20px;
+  border: 1px dashed var(--border-rose-dash);
+  border-radius: 2px;
+  background: rgba(185, 72, 100, 0.08);
+  color: var(--accent-rose-soft);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.denpa-track-card {
+  margin: 28px 0;
+  padding: 16px 20px;
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--route-accent, var(--accent-cyan));
+  background: rgba(11, 15, 38, 0.64);
+  font-family: var(--font-mono);
+  font-size: 0.80rem;
+  line-height: 1.9;
+  color: var(--text-muted);
+}
+
+.denpa-track-card strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.denpa-article-nav {
+  max-width: var(--prose-max);
+  margin: 12px auto 32px;
+  padding: 24px clamp(20px, 4vw, 32px) 0;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.denpa-article-nav a {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  transition: color 0.25s ease;
+}
+
+.denpa-article-nav a:hover {
+  color: var(--accent-gold-bright);
+}
+
+/* ==========================================================================
+   About Split Page & Diamond Colophon List (◇)
+   ========================================================================== */
+
+.denpa-about-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 310px) minmax(0, 1fr);
+  gap: clamp(28px, 4.5vw, 56px);
+  align-items: start;
+}
+
+.denpa-about-art {
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+  background: #060816;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.50);
+}
+
+.denpa-about-art img {
+  width: 100%;
+  display: block;
+}
+
+.denpa-about-copy p {
+  margin: 0 0 1.45em;
+  line-height: 2.0;
+  font-size: 0.96rem;
+}
+
+.denpa-colophon {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.denpa-colophon li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 0.90rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.denpa-colophon li::before {
+  content: '◇';
+  color: var(--accent-gold);
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+
+.denpa-discography {
+  margin-top: 44px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.denpa-discography-title {
+  margin: 0 0 16px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+}
+
+.denpa-discography-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.denpa-disc-item {
+  padding: 12px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.denpa-disc-name {
+  font-family: var(--font-serif);
+  font-size: 0.94rem;
+  color: var(--text-primary);
+}
+
+.denpa-disc-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Footer & Fixed Bottom Infinite Ticker Marquee
+   ========================================================================== */
+
+.denpa-footer {
+  text-align: center;
+  padding: 52px 20px 36px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 2;
+}
+
+.denpa-footer-signal {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+
+.denpa-marquee {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--marquee-height);
+  z-index: 45;
+  background: var(--bg-chrome);
+  border-top: 1px solid var(--border-gold-faint);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.denpa-marquee-track {
+  display: flex;
+  white-space: nowrap;
+  will-change: transform;
+  animation: denpa-ticker 46s linear infinite;
+}
+
+.denpa-marquee:hover .denpa-marquee-track {
+  animation-play-state: paused;
+}
+
+.denpa-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 14px;
+  font-size: 0.74rem;
+  letter-spacing: 0.10em;
+  color: var(--accent-gold-dim);
+}
+
+.denpa-marquee-item::after {
+  content: '◇';
+  color: rgba(212, 175, 76, 0.55);
+  font-size: 0.70rem;
+}
+
+@keyframes denpa-ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ==========================================================================
+   Responsive & Reduced-Motion Guardrails
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .denpa-hero {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .denpa-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .denpa-about-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .denpa-grid-3,
+  .denpa-discography-grid {
+    grid-template-columns: 1fr;
+  }
+  .denpa-nav {
+    padding: 0 14px;
+  }
+  .denpa-nav-links {
+    gap: 12px;
+  }
+  .denpa-nav-link {
+    font-size: 0.80rem;
+  }
+  .denpa-brand span {
+    font-size: 0.90rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .denpa-marquee-track {
+    animation: none;
+  }
+  .denpa-card, .denpa-card-thumb img, .denpa-gallery-tile img {
+    transition: none;
+  }
+}

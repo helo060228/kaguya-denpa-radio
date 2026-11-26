@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { POSTS } from '../../data/posts';
+---
+
+<BaseLayout
+  title="电波记录"
+  activeNav="/posts/"
+  backdrop="/images/gallery-tsukuyomi-city.jpg"
+>
+  <section class="denpa-container" style="padding-top: 44px; padding-bottom: 36px;">
+    <div class="denpa-section-header">
+      <div class="denpa-section-header-left">
+        <h1 class="denpa-section-title">电波记录</h1>
+        <span class="denpa-section-en">TRANSMISSIONS</span>
+      </div>
+      <span class="denpa-section-more">05 ARCHIVED LOGS</span>
+    </div>
+
+    <div class="denpa-filter-bar" role="group" aria-label="按路线筛选">
+      <button type="button" class="denpa-filter-btn is-active" data-route-filter="all">ALL</button>
+      <button type="button" class="denpa-filter-btn" data-route-filter="1">ROUTE 01 · 电线杆</button>
+      <button type="button" class="denpa-filter-btn" data-route-filter="2">ROUTE 02 · 月读</button>
+      <button type="button" class="denpa-filter-btn" data-route-filter="3">ROUTE 03 · 曲目志</button>
+      <button type="button" class="denpa-filter-btn" data-route-filter="4">ROUTE 04 · 满月</button>
+      <button type="button" class="denpa-filter-btn" data-route-filter="5">ROUTE 05 · 八千年</button>
+    </div>
+
+    <div class="denpa-grid-3">
+      {POSTS.map((post) => (
+        <a
+          class="denpa-card"
+          data-post-card
+          data-route={String(post.routeNum)}
+          href={`/posts/${post.slug}/`}
+        >
+          <div class="denpa-card-thumb">
+            <img src={post.cover} alt={post.title} loading="lazy" />
+          </div>
+          <div class="denpa-card-body">
+            <div class="denpa-card-meta">
+              {post.date} // {post.routeCode} · {post.routeSubtitle}
+            </div>
+            <h2 class="denpa-card-title">{post.title}</h2>
+            <p class="denpa-card-excerpt">{post.excerpt}</p>
+            <div class="denpa-tags">
+              {post.tags.map((tag) => (
+                <span class="denpa-tag">{tag}</span>
+              ))}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

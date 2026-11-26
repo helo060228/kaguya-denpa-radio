@@ -1,0 +1,14 @@
+{
+  "name": "kaguya-denpa-radio",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "月读电波台 — 《超时空辉夜姬！》二次元深夜电波风 Astro 同人档案站",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^7.4.13"
+  }
+}
