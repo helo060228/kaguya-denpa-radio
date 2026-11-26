@@ -195,14 +195,18 @@ img {
   top: 0;
   left: 0;
   right: 0;
-  height: var(--nav-height);
   z-index: 40;
+  background: linear-gradient(to bottom, rgba(4, 6, 19, 0.96) 0%, rgba(4, 6, 19, 0.72) 82%, transparent 100%);
+  backdrop-filter: blur(6px);
+}
+
+.denpa-nav-bar {
+  height: var(--nav-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 clamp(20px, 4vw, 48px);
-  background: linear-gradient(to bottom, rgba(4, 6, 19, 0.94) 0%, rgba(4, 6, 19, 0.58) 74%, transparent 100%);
-  backdrop-filter: blur(5px);
+  gap: 20px;
+  padding: 0 clamp(18px, 4vw, 48px);
 }
 
 .denpa-reading-progress {
@@ -227,6 +231,8 @@ img {
   font-size: 1.05rem;
   letter-spacing: 0.12em;
   color: var(--accent-gold);
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: color 0.25s ease;
 }
 
@@ -237,31 +243,38 @@ img {
 .denpa-brand-icon {
   width: 19px;
   height: 19px;
+  flex-shrink: 0;
   color: var(--accent-gold);
   filter: drop-shadow(0 0 6px rgba(212, 175, 76, 0.50));
 }
 
-.denpa-nav-right {
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 2.4vw, 32px);
+.denpa-nav-scroll {
+  margin-left: auto;
+  min-width: 0;
 }
 
 .denpa-nav-links {
   display: flex;
   align-items: center;
-  gap: clamp(14px, 2.2vw, 28px);
+  flex-wrap: nowrap;
+  gap: clamp(14px, 2vw, 26px);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
+.denpa-nav-links li {
+  flex-shrink: 0;
+}
+
 .denpa-nav-link {
   position: relative;
+  display: inline-block;
   font-size: 0.875rem;
   letter-spacing: 0.08em;
   color: var(--text-muted);
   padding: 6px 2px;
+  white-space: nowrap;
   transition: color 0.25s ease;
 }
 
@@ -296,6 +309,8 @@ img {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   letter-spacing: 0.10em;
+  white-space: nowrap;
+  flex-shrink: 0;
   cursor: pointer;
   transition: border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
@@ -1291,17 +1306,61 @@ a.denpa-section-more:hover {
   transform: translateY(-1px);
 }
 
+.denpa-disc-item.is-playing {
+  border-color: var(--accent-gold);
+  border-left-color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.10);
+  box-shadow: 0 0 18px rgba(212, 175, 76, 0.16);
+}
+
 .denpa-disc-head {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
 }
 
 .denpa-disc-name {
   font-family: var(--font-serif);
   font-size: 0.94rem;
   color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.denpa-disc-play {
+  padding: 3px 9px;
+  border: 1px solid var(--border-gold-faint);
+  border-radius: 2px;
+  background: rgba(212, 175, 76, 0.08);
+  color: var(--accent-gold);
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.denpa-disc-play:hover {
+  border-color: var(--accent-gold);
+  background: rgba(212, 175, 76, 0.18);
+  color: var(--accent-gold-bright);
+}
+
+.denpa-disc-play.is-playing {
+  border-color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.24);
+  color: #fff6db;
+  box-shadow: 0 0 12px rgba(212, 175, 76, 0.28);
+}
+
+.denpa-disc-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .denpa-disc-link {
@@ -1457,6 +1516,7 @@ a.denpa-section-more:hover {
   position: relative;
   display: inline-flex;
   align-items: stretch;
+  flex-shrink: 0;
 }
 
 .denpa-tuner-wrap .denpa-audio-btn {
@@ -1468,13 +1528,14 @@ a.denpa-section-more:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 7px;
+  padding: 0 8px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-left: none;
   border-radius: 0 2px 2px 0;
   background: rgba(8, 11, 28, 0.60);
   color: var(--text-muted);
   font-size: 0.70rem;
+  flex-shrink: 0;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
@@ -1490,13 +1551,13 @@ a.denpa-section-more:hover {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  width: 248px;
+  width: 320px;
   padding: 14px;
-  background: rgba(6, 9, 25, 0.96);
-  backdrop-filter: blur(12px);
+  background: rgba(6, 9, 25, 0.97);
+  backdrop-filter: blur(14px);
   border: 1px solid var(--border-gold);
   border-radius: 2px;
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.72);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.78);
   display: none;
   flex-direction: column;
   gap: 10px;
@@ -1505,6 +1566,217 @@ a.denpa-section-more:hover {
 
 .denpa-tuner-popover.is-open {
   display: flex;
+}
+
+.denpa-tuner-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.denpa-tuner-tab {
+  padding: 6px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  background: rgba(12, 17, 42, 0.55);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.denpa-tuner-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--border-tag);
+}
+
+.denpa-tuner-tab.is-active {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.12);
+}
+
+.denpa-tuner-panel {
+  display: none;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.denpa-tuner-panel.is-active {
+  display: flex;
+}
+
+.denpa-bgm-now {
+  padding: 10px 11px;
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--accent-gold);
+  border-radius: 2px;
+  background: rgba(12, 17, 44, 0.72);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.denpa-bgm-now-title {
+  font-family: var(--font-serif);
+  font-size: 0.90rem;
+  color: var(--text-ivory);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.denpa-bgm-now-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+
+.denpa-bgm-now-meta > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.denpa-bgm-time {
+  color: var(--accent-cyan);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.denpa-bgm-seek {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent-gold);
+  cursor: pointer;
+}
+
+.denpa-bgm-controls {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 6px;
+}
+
+.denpa-bgm-ctl {
+  padding: 5px 6px;
+  border: 1px solid var(--border-tag);
+  border-radius: 2px;
+  background: rgba(6, 9, 25, 0.75);
+  color: var(--text-body);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.denpa-bgm-ctl:hover {
+  border-color: var(--border-gold);
+  color: var(--accent-gold-bright);
+}
+
+.denpa-bgm-ctl.is-main {
+  border-color: var(--border-gold);
+  background: rgba(212, 175, 76, 0.14);
+  color: var(--accent-gold-bright);
+}
+
+.denpa-bgm-ctl.is-main:hover {
+  background: rgba(212, 175, 76, 0.24);
+}
+
+.denpa-bgm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 204px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.denpa-bgm-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: rgba(14, 19, 46, 0.44);
+  color: var(--text-body);
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.denpa-bgm-row:hover {
+  border-color: var(--border-tag);
+  background: rgba(20, 27, 64, 0.75);
+  color: var(--text-ivory);
+}
+
+.denpa-bgm-row.is-active {
+  border-color: var(--accent-gold);
+  background: rgba(212, 175, 76, 0.13);
+  color: var(--accent-gold-bright);
+}
+
+.denpa-bgm-row-num {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-dim);
+}
+
+.denpa-bgm-row.is-active .denpa-bgm-row-num {
+  color: var(--accent-gold);
+}
+
+.denpa-bgm-row-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.denpa-bgm-row-tag {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  padding: 1px 5px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.denpa-bgm-row.is-active .denpa-bgm-row-tag {
+  border-color: var(--border-gold-faint);
+  color: var(--accent-gold);
+}
+
+.denpa-bgm-note {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.denpa-tune-btn.is-playing {
+  border-color: var(--accent-gold-bright);
+  background: rgba(212, 175, 76, 0.20);
+  color: #fff6db;
+  box-shadow: 0 0 16px rgba(212, 175, 76, 0.24);
 }
 
 .denpa-tuner-title {
@@ -2182,17 +2454,69 @@ a.denpa-section-more:hover {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
+  body {
+    padding-top: 90px;
+  }
   .denpa-nav {
-    gap: 10px;
+    background: rgba(4, 6, 19, 0.94);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .denpa-nav-bar {
+    height: auto;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    gap: 0;
+  }
+  .denpa-brand {
+    order: 1;
+    padding: 10px 0 9px 14px;
+    font-size: 0.95rem;
+    letter-spacing: 0.10em;
+  }
+  .denpa-tuner-wrap {
+    order: 2;
+    padding: 8px 14px 7px 0;
+  }
+  .denpa-audio-btn {
+    padding: 4px 9px;
+    font-size: 0.68rem;
+  }
+  .denpa-nav-scroll {
+    order: 3;
+    flex: 0 0 100%;
+    width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 4px 14px 8px;
+  }
+  .denpa-nav-scroll::-webkit-scrollbar {
+    display: none;
   }
   .denpa-nav-links {
-    overflow-x: auto;
-    max-width: 52vw;
-    scrollbar-width: none;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 18px;
+    min-width: max-content;
+    padding-right: 14px;
   }
-  .denpa-nav-links::-webkit-scrollbar {
-    display: none;
+  .denpa-nav-link {
+    font-size: 0.82rem;
+    padding: 5px 2px 6px;
+  }
+  .denpa-tuner-popover {
+    position: fixed;
+    top: 48px;
+    right: 12px;
+    width: min(326px, calc(100vw - 24px));
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
   }
   .denpa-gb-row {
     grid-template-columns: 1fr;
@@ -2223,18 +2547,6 @@ a.denpa-section-more:hover {
   .denpa-grid-3,
   .denpa-discography-grid {
     grid-template-columns: 1fr;
-  }
-  .denpa-nav {
-    padding: 0 14px;
-  }
-  .denpa-nav-links {
-    gap: 12px;
-  }
-  .denpa-nav-link {
-    font-size: 0.80rem;
-  }
-  .denpa-brand span {
-    font-size: 0.90rem;
   }
 }
 

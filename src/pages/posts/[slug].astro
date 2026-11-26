@@ -20,6 +20,14 @@ interface Props {
 }
 
 const { post, prevPost, nextPost } = Astro.props;
+const bgmByRoute: Record<number, { id: string; label: string }> = {
+  1: { id: 'kaguya-iroha', label: '▶ 试听本篇配乐：かぐやと彩葉 (Conisch)' },
+  2: { id: 'love-myself', label: '▶ 试听本篇插曲：私は、わたしの事が好き。' },
+  3: { id: 'ex-otogibanashi', label: '▶ 试听主题曲：Ex-Otogibanashi' },
+  4: { id: 'ray', label: '▶ 试听片尾曲：ray (超かぐや姫! Version)' },
+  5: { id: 'remember', label: '▶ 试听八千代插曲：Remember (忆昔)' },
+};
+const routeBgm = bgmByRoute[post.routeNum];
 const routeVar = `var(--route-${post.routeNum})`;
 ---
 
@@ -76,6 +84,14 @@ const routeVar = `var(--route-${post.routeNum})`;
             <div>// SOUNDTRACK LOG · <strong>{post.trackNote.title}</strong></div>
             <div>CREDIT: {post.trackNote.artist}</div>
             <div>NOTE: {post.trackNote.note}</div>
+          </div>
+        )}
+
+        {routeBgm && (
+          <div style="margin-top: 24px;">
+            <button type="button" class="denpa-tune-btn" data-play-bgm={routeBgm.id}>
+              {routeBgm.label}
+            </button>
           </div>
         )}
       </div>

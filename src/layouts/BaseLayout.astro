@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../data/site';
+import { BGM_TRACKS } from '../data/bgm';
 import '../styles/denpa.css';
 
 interface Props {
@@ -42,86 +43,150 @@ const {
     <!-- Layer 2: Persistent Ambient Canvas (Survives Route Transitions) -->
     <canvas id="denpa-ambient" class="denpa-ambient-canvas" aria-hidden="true" transition:persist="denpa-canvas"></canvas>
 
-    <!-- Layer 40: Sticky Translucent Top Navigation -->
+    <!-- Persistent HTML5 Audio Element for Continuous BGM Playback -->
+    <audio id="denpa-bgm-audio" preload="none" transition:persist="denpa-bgm-audio"></audio>
+
+    <!-- Layer 40: Sticky Translucent Top Navigation (Responsive 2-Row on Mobile) -->
     <header class="denpa-nav">
-      <a class="denpa-brand" href="/" aria-label="返回月读电波台首页">
-        <svg class="denpa-brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <g transform="translate(12 12)">
-            <ellipse rx="1.6" ry="4.6" cy="-6" />
-            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(45)" />
-            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(90)" />
-            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(135)" />
-            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(180)" />
-            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(225)" />
-            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(270)" />
-            <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(315)" />
-            <circle r="2.2" fill="#fff2cc" />
-          </g>
-        </svg>
-        <span>{SITE.title}</span>
-      </a>
+      <div class="denpa-nav-bar">
+        <a class="denpa-brand" href="/" aria-label="返回月读电波台首页">
+          <svg class="denpa-brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <g transform="translate(12 12)">
+              <ellipse rx="1.6" ry="4.6" cy="-6" />
+              <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(45)" />
+              <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(90)" />
+              <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(135)" />
+              <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(180)" />
+              <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(225)" />
+              <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(270)" />
+              <ellipse rx="1.6" ry="4.6" cy="-6" transform="rotate(315)" />
+              <circle r="2.2" fill="#fff2cc" />
+            </g>
+          </svg>
+          <span>{SITE.title}</span>
+        </a>
 
-      <nav class="denpa-nav-right" aria-label="主导航">
-        <ul class="denpa-nav-links">
-          {SITE.nav.map((item) => (
-            <li>
-              <a
-                class:list={['denpa-nav-link', { 'is-active': activeNav === item.href }]}
-                href={item.href}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <nav class="denpa-nav-scroll" aria-label="主导航">
+          <ul class="denpa-nav-links">
+            {SITE.nav.map((item) => (
+              <li>
+                <a
+                  class:list={['denpa-nav-link', { 'is-active': activeNav === item.href }]}
+                  href={item.href}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-        <!-- Persistent Multi-Channel Ambient Tuner -->
-        <div class="denpa-tuner-wrap" transition:persist="denpa-tuner">
+        <!-- Persistent BGM + Ambient Tuner -->
+        <div
+          class="denpa-tuner-wrap"
+          data-bgm-tracks={JSON.stringify(BGM_TRACKS)}
+          transition:persist="denpa-tuner"
+        >
           <button
             type="button"
             class="denpa-audio-btn"
             data-denpa-audio
             aria-pressed="false"
-            aria-label="开关深夜氛围电波"
-            title="左键一键开关音频，右侧▾切换频道"
+            aria-label="播放或暂停超时空辉夜姬经典 BGM"
+            title="点击一键播放 BGM，点右侧▾展开曲目列表与白噪频道"
           >
             <span class="denpa-eq" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span data-audio-label>((•)) OFF</span>
+            <span data-audio-label>♪ BGM</span>
           </button>
           <button
             type="button"
             class="denpa-tuner-chevron"
             data-tuner-toggle
             aria-expanded="false"
-            aria-label="展开多声道氛围调频面板"
-            title="切换氛围声道（白噪 / 夜雨 / 月读和弦）"
+            aria-label="展开 BGM 播放列表与氛围调频器"
+            title="展开经典 BGM 歌单与深夜白噪频道"
           >
             ▾
           </button>
 
-          <div class="denpa-tuner-popover" data-tuner-popover role="dialog" aria-label="深夜电波调频器">
-            <div class="denpa-tuner-title">// AMBIENT TUNER · 选择氛围声道</div>
-            <div class="denpa-tuner-channels" role="radiogroup" aria-label="氛围声道">
-              <button type="button" class="denpa-ch-btn is-active" data-audio-channel="static" aria-checked="true">
-                <span>CH.01 短波白噪</span>
-                <em>8000 kHz</em>
+          <div class="denpa-tuner-popover" data-tuner-popover role="dialog" aria-label="月读点唱机与氛围调频器">
+            <div class="denpa-tuner-tabs" role="tablist">
+              <button type="button" class="denpa-tuner-tab is-active" data-tuner-tab="bgm" role="tab" aria-selected="true">
+                ♪ 经典 BGM
               </button>
-              <button type="button" class="denpa-ch-btn" data-audio-channel="rain" aria-checked="false">
-                <span>CH.02 东京夜雨</span>
-                <em>101.4 MHz</em>
-              </button>
-              <button type="button" class="denpa-ch-btn" data-audio-channel="pad" aria-checked="false">
-                <span>CH.03 月读和弦</span>
-                <em>104.8 MHz</em>
+              <button type="button" class="denpa-tuner-tab" data-tuner-tab="ambient" role="tab" aria-selected="false">
+                ((•)) 氛围底噪
               </button>
             </div>
+
+            <!-- Panel 1: Official Classic BGM Jukebox -->
+            <div class="denpa-tuner-panel is-active" data-tuner-panel="bgm">
+              <div class="denpa-bgm-now">
+                <div class="denpa-bgm-now-title" data-bgm-title>{BGM_TRACKS[0].title}</div>
+                <div class="denpa-bgm-now-meta">
+                  <span data-bgm-artist>{BGM_TRACKS[0].artist}</span>
+                  <span class="denpa-bgm-time" data-bgm-time>00:00 / 00:00</span>
+                </div>
+                <input
+                  type="range"
+                  class="denpa-bgm-seek"
+                  min="0"
+                  max="100"
+                  value="0"
+                  step="0.5"
+                  aria-label="曲目播放进度"
+                  data-bgm-seek
+                />
+                <div class="denpa-bgm-controls">
+                  <button type="button" class="denpa-bgm-ctl" data-bgm-prev aria-label="上一首">⏮ 上一首</button>
+                  <button type="button" class="denpa-bgm-ctl is-main" data-bgm-play aria-label="播放或暂停">▶ 播放</button>
+                  <button type="button" class="denpa-bgm-ctl" data-bgm-next aria-label="下一首">下一首 ⏭</button>
+                </div>
+              </div>
+
+              <div class="denpa-bgm-list" role="listbox" aria-label="超时空辉夜姬经典曲目">
+                {BGM_TRACKS.map((track, idx) => (
+                  <button
+                    type="button"
+                    class:list={['denpa-bgm-row', { 'is-active': idx === 0 }]}
+                    data-bgm-pick={track.id}
+                    aria-selected={idx === 0 ? 'true' : 'false'}
+                  >
+                    <span class="denpa-bgm-row-num">{String(idx + 1).padStart(2, '0')}</span>
+                    <span class="denpa-bgm-row-name">{track.title}</span>
+                    <em class="denpa-bgm-row-tag">{track.tag}</em>
+                  </button>
+                ))}
+              </div>
+              <div class="denpa-bgm-note">官方原声高音质试听流 · 自动连播跨页不断流</div>
+            </div>
+
+            <!-- Panel 2: 3-Channel Web Audio Ambient Synth -->
+            <div class="denpa-tuner-panel" data-tuner-panel="ambient">
+              <div class="denpa-tuner-title">// AMBIENT TUNER · 深夜纯合成底噪</div>
+              <div class="denpa-tuner-channels" role="radiogroup" aria-label="氛围声道">
+                <button type="button" class="denpa-ch-btn is-active" data-audio-channel="static" aria-checked="true">
+                  <span>CH.01 短波白噪</span>
+                  <em>8000 kHz</em>
+                </button>
+                <button type="button" class="denpa-ch-btn" data-audio-channel="rain" aria-checked="false">
+                  <span>CH.02 东京夜雨</span>
+                  <em>101.4 MHz</em>
+                </button>
+                <button type="button" class="denpa-ch-btn" data-audio-channel="pad" aria-checked="false">
+                  <span>CH.03 月读和弦</span>
+                  <em>104.8 MHz</em>
+                </button>
+              </div>
+            </div>
+
             <label class="denpa-tuner-vol">
               <span>音量</span>
               <input type="range" min="10" max="100" value="65" data-audio-volume />
             </label>
           </div>
         </div>
-      </nav>
+      </div>
 
       {readingAccent && (
         <div

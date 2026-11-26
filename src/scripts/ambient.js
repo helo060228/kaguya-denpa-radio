@@ -23,6 +23,15 @@ const audioState = {
   channel: 'static',
   volume: 0.65,
   playing: false,
+  mode: 'bgm', // 'bgm' | 'ambient'
+};
+
+const bgmState = {
+  tracks: [],
+  index: 0,
+  playing: false,
+  seeking: false,
+  tab: 'bgm',
 };
 
 let canvasStarted = false;
@@ -31,6 +40,9 @@ let toastTimer = null;
 let scrollListenerBound = false;
 let lightboxKeyHandler = null;
 let tunerDocClickBound = false;
+let audioElBound = false;
+let playBgmByIdFn = null;
+let syncAllAudioUIFn = null;
 
 export function bootDenpaAtmosphere() {
   if (!canvasStarted) {
@@ -44,7 +56,9 @@ export function bootDenpaAtmosphere() {
   const scanlines = document.querySelector('[data-scanlines]');
   if (scanlines) scanlines.classList.remove('is-muted');
 
+  scrollActiveNavIntoView();
   bindAudioTuner();
+  bindPageBgmTriggers();
   bindCountdown();
   bindRandomQuote();
   bindRouteFilters();
@@ -55,6 +69,15 @@ export function bootDenpaAtmosphere() {
   bindGuestbook();
   bindScrollBehaviors();
   bindScrollReveals();
+}
+
+function scrollActiveNavIntoView() {
+  if (window.innerWidth > 860) return;
+  const scroller = document.querySelector('.denpa-nav-scroll');
+  const active = scroller?.querySelector('.denpa-nav-link.is-active');
+  if (!scroller || !active) return;
+  const targetLeft = active.offsetLeft - (scroller.clientWidth - active.offsetWidth) / 2;
+  scroller.scrollTo({ left: Math.max(0, targetLeft), behavior: 'auto' });
 }
 
 function showSignalToast(message) {
@@ -295,28 +318,130 @@ function targetGainFor(channel, volume) {
   return Math.max(0.0001, base * volume);
 }
 
+function formatTime(sec) {
+  if (!Number.isFinite(sec) || sec < 0) return '00:00';
+  const total = Math.floor(sec);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function stopAmbientSilent() {
+  if (audioState.ctx && audioState.masterGain) {
+    const now = audioState.ctx.currentTime;
+    audioState.masterGain.gain.cancelScheduledValues(now);
+    audioState.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+  }
+  audioState.playing = false;
+}
+
 function bindAudioTuner() {
+  const wrap = document.querySelector('.denpa-tuner-wrap');
   const btn = document.querySelector('[data-denpa-audio]');
   const chev = document.querySelector('[data-tuner-toggle]');
   const pop = document.querySelector('[data-tuner-popover]');
   const volInput = document.querySelector('[data-audio-volume]');
   const chBtns = document.querySelectorAll('[data-audio-channel]');
-  if (!btn || btn.dataset.bound === '1') return;
-  btn.dataset.bound = '1';
+  const tabBtns = document.querySelectorAll('[data-tuner-tab]');
+  const panels = document.querySelectorAll('[data-tuner-panel]');
+  const audioEl = document.getElementById('denpa-bgm-audio');
+  if (!wrap || !btn) return;
+
+  if (!bgmState.tracks.length) {
+    try {
+      const parsed = JSON.parse(wrap.getAttribute('data-bgm-tracks') || '[]');
+      if (Array.isArray(parsed)) bgmState.tracks = parsed;
+    } catch {
+      bgmState.tracks = [];
+    }
+  }
 
   const labelEl = btn.querySelector('[data-audio-label]');
+  const titleEl = pop?.querySelector('[data-bgm-title]');
+  const artistEl = pop?.querySelector('[data-bgm-artist]');
+  const timeEl = pop?.querySelector('[data-bgm-time]');
+  const seekEl = pop?.querySelector('[data-bgm-seek]');
+  const playBtn = pop?.querySelector('[data-bgm-play]');
+  const prevBtn = pop?.querySelector('[data-bgm-prev]');
+  const nextBtn = pop?.querySelector('[data-bgm-next]');
+  const pickRows = pop?.querySelectorAll('[data-bgm-pick]') || [];
+
+  const syncPageButtons = () => {
+    const activeTrack = bgmState.tracks[bgmState.index];
+    document.querySelectorAll('[data-play-bgm]').forEach((el) => {
+      if (!el.dataset.idleLabel) {
+        el.dataset.idleLabel = el.textContent.trim();
+      }
+      const id = el.getAttribute('data-play-bgm');
+      const isThisPlaying = bgmState.playing && activeTrack && activeTrack.id === id;
+      el.classList.toggle('is-playing', Boolean(isThisPlaying));
+      el.setAttribute('aria-pressed', String(Boolean(isThisPlaying)));
+      if (isThisPlaying) {
+        el.textContent = el.classList.contains('denpa-disc-play')
+          ? '❚❚ 播放中'
+          : `❚❚ 正在播放：${activeTrack.title}`;
+      } else {
+        el.textContent = el.dataset.idleLabel;
+      }
+      const discCard = el.closest('.denpa-disc-item');
+      if (discCard) discCard.classList.toggle('is-playing', Boolean(isThisPlaying));
+    });
+  };
+
   const syncVisual = () => {
-    btn.setAttribute('aria-pressed', String(audioState.playing));
+    const anyPlaying = bgmState.playing || audioState.playing;
+    btn.setAttribute('aria-pressed', String(anyPlaying));
+    const currentTrack = bgmState.tracks[bgmState.index];
+
     if (labelEl) {
-      labelEl.textContent = audioState.playing ? '((•)) ON' : '((•)) OFF';
+      if (bgmState.playing) labelEl.textContent = '♪ ON';
+      else if (audioState.playing) labelEl.textContent = '((•)) ON';
+      else labelEl.textContent = '♪ BGM';
     }
+
+    if (currentTrack) {
+      btn.title = bgmState.playing
+        ? `正在播放：${currentTrack.title}（点击暂停，点 ▾ 切歌）`
+        : '点击一键播放 BGM，点右侧 ▾ 展开曲目列表与白噪频道';
+      if (titleEl) titleEl.textContent = currentTrack.title;
+      if (artistEl) artistEl.textContent = currentTrack.artist;
+    }
+
+    if (playBtn) {
+      playBtn.textContent = bgmState.playing ? '❚❚ 暂停' : '▶ 播放';
+    }
+
+    pickRows.forEach((row) => {
+      const active = currentTrack && row.getAttribute('data-bgm-pick') === currentTrack.id;
+      row.classList.toggle('is-active', Boolean(active));
+      row.setAttribute('aria-selected', String(Boolean(active)));
+    });
+
     chBtns.forEach((b) => {
       const active = b.getAttribute('data-audio-channel') === audioState.channel;
       b.classList.toggle('is-active', active);
       b.setAttribute('aria-checked', String(active));
     });
+
+    tabBtns.forEach((t) => {
+      const active = t.getAttribute('data-tuner-tab') === bgmState.tab;
+      t.classList.toggle('is-active', active);
+      t.setAttribute('aria-selected', String(active));
+    });
+
+    panels.forEach((p) => {
+      p.classList.toggle('is-active', p.getAttribute('data-tuner-panel') === bgmState.tab);
+    });
+
+    syncPageButtons();
   };
-  syncVisual();
+
+  syncAllAudioUIFn = syncVisual;
+
+  const switchTab = (tabName) => {
+    bgmState.tab = tabName === 'ambient' ? 'ambient' : 'bgm';
+    syncVisual();
+  };
 
   const ensureCtx = () => {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -331,12 +456,73 @@ function bindAudioTuner() {
     return true;
   };
 
-  const turnOn = (channel = audioState.channel) => {
+  const pauseBgm = (silent = false) => {
+    if (audioEl && !audioEl.paused) {
+      audioEl.pause();
+    }
+    bgmState.playing = false;
+    syncVisual();
+    if (!silent) showSignalToast('// BGM PAUSED — 已暂停曲目播放');
+  };
+
+  const playBgmIndex = (idx, showToast = true) => {
+    if (!audioEl || !bgmState.tracks.length) return;
+    const safeIdx = ((idx % bgmState.tracks.length) + bgmState.tracks.length) % bgmState.tracks.length;
+    const track = bgmState.tracks[safeIdx];
+    bgmState.index = safeIdx;
+    audioState.mode = 'bgm';
+    bgmState.tab = 'bgm';
+
+    // Stop ambient synth if active
+    if (audioState.playing) stopAmbientSilent();
+
+    if (audioEl.dataset.trackId !== track.id) {
+      audioEl.src = track.src;
+      audioEl.dataset.trackId = track.id;
+      if (seekEl) seekEl.value = '0';
+      if (timeEl) timeEl.textContent = '00:00 / 00:00';
+    }
+    audioEl.volume = Math.min(1, Math.max(0.05, audioState.volume));
+
+    const playPromise = audioEl.play();
+    bgmState.playing = true;
+    syncVisual();
+
+    if (showToast) {
+      showSignalToast(`// NOW PLAYING · ${track.title}`);
+    }
+
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch((err) => {
+        if (err && err.name === 'AbortError') return;
+        bgmState.playing = false;
+        syncVisual();
+        showSignalToast('// PLAYBACK BLOCKED — 请点击页面按钮重试播放');
+      });
+    }
+  };
+
+  const playBgmById = (trackId) => {
+    const idx = bgmState.tracks.findIndex((t) => t.id === trackId);
+    if (idx < 0) return;
+    if (bgmState.playing && bgmState.index === idx) {
+      pauseBgm();
+    } else {
+      playBgmIndex(idx, true);
+    }
+  };
+
+  playBgmByIdFn = playBgmById;
+
+  const turnOnAmbient = (channel = audioState.channel) => {
     if (!ensureCtx()) {
       showSignalToast('// AUDIO UNAVAILABLE — 当前浏览器不支持 Web Audio');
       return;
     }
+    if (bgmState.playing) pauseBgm(true);
+    audioState.mode = 'ambient';
     audioState.channel = channel;
+    bgmState.tab = 'ambient';
     buildChannelGraph(channel);
     const now = audioState.ctx.currentTime;
     audioState.masterGain.gain.cancelScheduledValues(now);
@@ -349,18 +535,63 @@ function bindAudioTuner() {
     showSignalToast(CHANNEL_INFO[channel]?.toast || '// TUNED — 氛围音频已开启');
   };
 
-  const turnOff = () => {
-    if (audioState.ctx && audioState.masterGain) {
-      const now = audioState.ctx.currentTime;
-      audioState.masterGain.gain.cancelScheduledValues(now);
-      audioState.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-    }
-    audioState.playing = false;
+  const turnOffAmbient = () => {
+    stopAmbientSilent();
     syncVisual();
     showSignalToast('// STANDBY — 深夜氛围音频已静默');
   };
 
-  btn.addEventListener('click', () => (audioState.playing ? turnOff() : turnOn()));
+  // Bind HTML5 Audio events once (persisted across page loads)
+  if (audioEl && !audioElBound) {
+    audioElBound = true;
+    audioEl.addEventListener('timeupdate', () => {
+      const dur = audioEl.duration;
+      const cur = audioEl.currentTime;
+      const liveTime = document.querySelector('[data-bgm-time]');
+      const liveSeek = document.querySelector('[data-bgm-seek]');
+      if (liveTime) liveTime.textContent = `${formatTime(cur)} / ${formatTime(dur)}`;
+      if (liveSeek && !bgmState.seeking && Number.isFinite(dur) && dur > 0) {
+        liveSeek.value = String((cur / dur) * 100);
+      }
+    });
+    audioEl.addEventListener('loadedmetadata', () => {
+      const liveTime = document.querySelector('[data-bgm-time]');
+      if (liveTime) liveTime.textContent = `${formatTime(audioEl.currentTime)} / ${formatTime(audioEl.duration)}`;
+    });
+    audioEl.addEventListener('play', () => {
+      bgmState.playing = true;
+      if (syncAllAudioUIFn) syncAllAudioUIFn();
+    });
+    audioEl.addEventListener('pause', () => {
+      bgmState.playing = false;
+      if (syncAllAudioUIFn) syncAllAudioUIFn();
+    });
+    audioEl.addEventListener('ended', () => {
+      playBgmIndex(bgmState.index + 1, true);
+    });
+    audioEl.addEventListener('error', () => {
+      bgmState.playing = false;
+      if (syncAllAudioUIFn) syncAllAudioUIFn();
+      showSignalToast('// STREAM ERROR — 音频流加载异常，请切换下一首');
+    });
+  }
+
+  syncVisual();
+
+  if (btn.dataset.bound === '1') return;
+  btn.dataset.bound = '1';
+
+  btn.addEventListener('click', () => {
+    if (bgmState.playing) {
+      pauseBgm();
+    } else if (audioState.playing) {
+      turnOffAmbient();
+    } else if (audioState.mode === 'ambient') {
+      turnOnAmbient(audioState.channel);
+    } else {
+      playBgmIndex(bgmState.index, true);
+    }
+  });
 
   if (chev && pop) {
     chev.addEventListener('click', (e) => {
@@ -383,16 +614,55 @@ function bindAudioTuner() {
     }
   }
 
+  tabBtns.forEach((t) => {
+    t.addEventListener('click', () => switchTab(t.getAttribute('data-tuner-tab') || 'bgm'));
+  });
+
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      if (bgmState.playing) pauseBgm();
+      else playBgmIndex(bgmState.index, true);
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => playBgmIndex(bgmState.index - 1, true));
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => playBgmIndex(bgmState.index + 1, true));
+  }
+
+  if (seekEl && audioEl) {
+    seekEl.addEventListener('pointerdown', () => { bgmState.seeking = true; });
+    seekEl.addEventListener('pointerup', () => { bgmState.seeking = false; });
+    seekEl.addEventListener('input', () => {
+      if (Number.isFinite(audioEl.duration) && audioEl.duration > 0) {
+        audioEl.currentTime = (Number(seekEl.value) / 100) * audioEl.duration;
+      }
+    });
+    seekEl.addEventListener('change', () => { bgmState.seeking = false; });
+  }
+
+  pickRows.forEach((row) => {
+    row.addEventListener('click', () => {
+      const id = row.getAttribute('data-bgm-pick') || '';
+      const idx = bgmState.tracks.findIndex((t) => t.id === id);
+      if (idx >= 0) playBgmIndex(idx, true);
+    });
+  });
+
   chBtns.forEach((b) => {
     b.addEventListener('click', () => {
       const ch = b.getAttribute('data-audio-channel') || 'static';
-      turnOn(ch);
+      turnOnAmbient(ch);
     });
   });
 
   if (volInput) {
     volInput.addEventListener('input', () => {
       audioState.volume = Number(volInput.value) / 100;
+      if (audioEl) audioEl.volume = Math.min(1, Math.max(0.05, audioState.volume));
       if (audioState.playing && audioState.ctx && audioState.masterGain) {
         const now = audioState.ctx.currentTime;
         audioState.masterGain.gain.setTargetAtTime(
@@ -403,6 +673,19 @@ function bindAudioTuner() {
       }
     });
   }
+}
+
+function bindPageBgmTriggers() {
+  const buttons = document.querySelectorAll('[data-play-bgm]');
+  buttons.forEach((el) => {
+    if (el.dataset.bgmBound === '1') return;
+    el.dataset.bgmBound = '1';
+    el.addEventListener('click', () => {
+      const id = el.getAttribute('data-play-bgm');
+      if (id && playBgmByIdFn) playBgmByIdFn(id);
+    });
+  });
+  if (syncAllAudioUIFn) syncAllAudioUIFn();
 }
 
 /* --------------------------------------------------------------------------
