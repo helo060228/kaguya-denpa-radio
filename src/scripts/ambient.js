@@ -114,17 +114,31 @@ function mountAmbientCanvas(canvas) {
   resize();
   window.addEventListener('resize', resize);
 
-  const particles = Array.from({ length: 28 }, (_, idx) => {
-    const kind = idx % 5 === 0 ? 'motif' : idx % 3 === 0 ? 'bokeh' : 'sparkle';
+  const particles = Array.from({ length: 30 }, (_, idx) => {
+    const kind =
+      idx % 6 === 0
+        ? 'crescent'
+        : idx % 6 === 3
+          ? 'note'
+          : idx % 3 === 1
+            ? 'bokeh'
+            : 'sparkle';
     return {
       kind,
       x: Math.random() * width,
       y: Math.random() * height,
-      r: kind === 'bokeh' ? 4 + Math.random() * 6 : kind === 'motif' ? 5 + Math.random() * 4 : 1.5 + Math.random() * 2.5,
+      r:
+        kind === 'bokeh'
+          ? 4 + Math.random() * 6
+          : kind === 'crescent'
+            ? 5.2 + Math.random() * 4.2
+            : kind === 'note'
+              ? 4.6 + Math.random() * 3.0
+              : 1.5 + Math.random() * 2.4,
       vx: (Math.random() - 0.5) * 0.14,
       vy: -0.08 - Math.random() * 0.16,
-      rot: Math.random() * Math.PI * 2,
-      vrot: (Math.random() - 0.5) * 0.007,
+      rot: (Math.random() - 0.5) * 0.65,
+      vrot: (Math.random() - 0.5) * 0.0045,
       phase: Math.random() * Math.PI * 2,
       alpha: 0.24 + Math.random() * 0.52,
     };
@@ -136,21 +150,74 @@ function mountAmbientCanvas(canvas) {
     { x: 0.37, y: 0.35, r: 2.8 },
   ];
 
-  const drawLunarBlossom = (x, y, r, rot, alpha) => {
+  const drawCrescentMoon = (x, y, r, rot, alpha) => {
+    const d = r * 0.42;
+    const r2 = r * 0.88;
+    const xInt = (r * r - r2 * r2 + d * d) / (2 * d);
+    const yInt = Math.sqrt(Math.max(0.001, r * r - xInt * xInt));
+    const a1 = Math.atan2(yInt, xInt);
+    const a2 = Math.atan2(yInt, xInt - d);
+
     ctx.save();
     ctx.translate(x, y);
-    ctx.rotate(rot);
-    ctx.fillStyle = `rgba(${accentRgb}, ${alpha})`;
-    for (let i = 0; i < 8; i++) {
-      ctx.rotate(Math.PI / 4);
-      ctx.beginPath();
-      ctx.ellipse(0, -r * 0.62, r * 0.22, r * 0.52, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.rotate(rot - 0.32);
+
+    // Subtle cosmic orbit arc around the crescent
     ctx.beginPath();
-    ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 242, 204, ${Math.min(1, alpha + 0.15)})`;
+    ctx.ellipse(0, 0, r * 1.42, r * 0.44, -0.42, 0.25, Math.PI * 1.82);
+    ctx.strokeStyle = `rgba(138, 211, 232, ${alpha * 0.36})`;
+    ctx.lineWidth = 0.85;
+    ctx.stroke();
+
+    // Glowing golden crescent body
+    ctx.beginPath();
+    ctx.arc(0, 0, r, a1, Math.PI * 2 - a1, false);
+    ctx.arc(d, 0, r2, -a2, a2, true);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(${accentRgb}, ${alpha})`;
     ctx.fill();
+
+    // Tiny starlet nestled in the crescent hollow
+    const sx = r * 0.52;
+    const sy = -r * 0.14;
+    const sr = r * 0.16;
+    ctx.fillStyle = `rgba(255, 244, 210, ${Math.min(1, alpha + 0.16)})`;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy - sr * 2.2);
+    ctx.quadraticCurveTo(sx + sr * 0.3, sy - sr * 0.3, sx + sr * 2.2, sy);
+    ctx.quadraticCurveTo(sx + sr * 0.3, sy + sr * 0.3, sx, sy + sr * 2.2);
+    ctx.quadraticCurveTo(sx - sr * 0.3, sy + sr * 0.3, sx - sr * 2.2, sy);
+    ctx.quadraticCurveTo(sx - sr * 0.3, sy - sr * 0.3, sx, sy - sr * 2.2);
+    ctx.fill();
+
+    ctx.restore();
+  };
+
+  const drawMusicNote = (x, y, r, rot, alpha) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin(rot * 2) * 0.22);
+    ctx.fillStyle = `rgba(138, 211, 232, ${alpha * 0.88})`;
+    ctx.strokeStyle = `rgba(231, 200, 114, ${alpha * 0.92})`;
+    ctx.lineWidth = Math.max(1.1, r * 0.2);
+    ctx.lineCap = 'round';
+
+    // Slanted oval note head
+    ctx.save();
+    ctx.translate(-r * 0.22, r * 0.62);
+    ctx.rotate(-0.35);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.44, r * 0.30, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Slender stem + graceful eighth-note flag
+    ctx.beginPath();
+    ctx.moveTo(r * 0.14, r * 0.54);
+    ctx.lineTo(r * 0.14, -r * 0.92);
+    ctx.bezierCurveTo(r * 0.68, -r * 0.68, r * 0.96, -r * 0.22, r * 0.56, r * 0.18);
+    ctx.stroke();
+
     ctx.restore();
   };
 
@@ -202,7 +269,8 @@ function mountAmbientCanvas(canvas) {
     for (const p of particles) {
       const pulse = 0.65 + 0.35 * Math.sin(now * 0.0012 + p.phase);
       const a = p.alpha * pulse;
-      if (p.kind === 'motif') drawLunarBlossom(p.x, p.y, p.r, p.rot, a);
+      if (p.kind === 'crescent') drawCrescentMoon(p.x, p.y, p.r, p.rot, a);
+      else if (p.kind === 'note') drawMusicNote(p.x, p.y, p.r, p.rot + now * 0.0005, a);
       else if (p.kind === 'bokeh') drawBokeh(p.x, p.y, p.r, a * 0.85);
       else drawSparkle(p.x, p.y, p.r, a);
 
@@ -210,9 +278,9 @@ function mountAmbientCanvas(canvas) {
         p.x += p.vx;
         p.y += p.vy;
         p.rot += p.vrot;
-        if (p.y < -20) { p.y = height + 20; p.x = Math.random() * width; }
-        if (p.x < -20) p.x = width + 20;
-        if (p.x > width + 20) p.x = -20;
+        if (p.y < -24) { p.y = height + 24; p.x = Math.random() * width; }
+        if (p.x < -24) p.x = width + 24;
+        if (p.x > width + 24) p.x = -24;
       }
     }
 
