@@ -712,8 +712,47 @@ function bindCountdown() {
   countdownInterval = setInterval(tick, 1000);
 }
 
+let quoteRafId = null;
+let quoteCleanupTimers = [];
+
+function clearQuoteAnim() {
+  if (quoteRafId) {
+    cancelAnimationFrame(quoteRafId);
+    quoteRafId = null;
+  }
+  quoteCleanupTimers.forEach((id) => clearTimeout(id));
+  quoteCleanupTimers = [];
+}
+
+function tokenizeQuoteLine(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const tokens = [];
+  const walk = (node, gold) => {
+    if (node.nodeType === 3) {
+      for (const ch of node.textContent || '') {
+        tokens.push({ ch, gold });
+      }
+    } else if (node.nodeType === 1) {
+      const isGold = gold || node.classList.contains('hl-gold');
+      node.childNodes.forEach((child) => walk(child, isGold));
+    }
+  };
+  tmp.childNodes.forEach((child) => walk(child, false));
+  return tokens;
+}
+
+function escapeHtmlChar(ch) {
+  if (ch === '&') return '&amp;';
+  if (ch === '<') return '&lt;';
+  if (ch === '>') return '&gt;';
+  return ch;
+}
+
 function bindRandomQuote() {
+  clearQuoteAnim();
   const btn = document.querySelector('[data-random-quote-btn]');
+  const btnLabel = document.querySelector('[data-random-quote-btn-label]');
   const qEl = document.querySelector('[data-random-quote-text]');
   const sEl = document.querySelector('[data-random-quote-source]');
   if (!btn || !qEl || !sEl) return;
@@ -726,20 +765,142 @@ function bindRandomQuote() {
   }
   if (quotes.length < 2) return;
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const WIDE_GLYPHS = '░▒▓◈◇アイウエオカキクケコサシスセソタチツテト月読星軌波信∴∵';
+  const NARROW_GLYPHS = '0123456789ABCDEF/\\|:+-*#';
+  const KEEP_CHARS = new Set([' ', '\u3000', '「', '」', '（', '）']);
+
+  const pickGlyph = (ch) => {
+    if (KEEP_CHARS.has(ch)) return ch;
+    const isAscii = ch.charCodeAt(0) < 128;
+    const pool = isAscii ? NARROW_GLYPHS : WIDE_GLYPHS;
+    return pool[Math.floor(Math.random() * pool.length)];
+  };
+
   let current = 0;
+
   btn.addEventListener('click', () => {
+    clearQuoteAnim();
+
     let next = current;
     while (next === current) {
       next = Math.floor(Math.random() * quotes.length);
     }
     current = next;
     const item = quotes[current];
+
+    if (reducedMotion) {
+      qEl.style.opacity = '0.35';
+      quoteCleanupTimers.push(
+        setTimeout(() => {
+          qEl.innerHTML = `${item.lines[0]}<br />${item.lines[1]}`;
+          sEl.textContent = item.source;
+          qEl.style.opacity = '';
+        }, 180)
+      );
+      return;
+    }
+
+    const line1Tokens = tokenizeQuoteLine(item.lines[0]);
+    const line2Tokens = tokenizeQuoteLine(item.lines[1]);
+    const allLines = [line1Tokens, line2Tokens];
+    const totalChars = line1Tokens.length + line2Tokens.length;
+
+    // Preserve container height so page doesn't jitter while scrambling
+    const prevHeight = qEl.offsetHeight;
+    if (prevHeight > 0) qEl.style.minHeight = `${prevHeight}px`;
+
+    btn.classList.add('is-tuning');
+    if (btnLabel) btnLabel.textContent = '频段扫描解码中…';
+
+    qEl.classList.remove('is-locked', 'is-decoding');
     qEl.classList.add('is-glitching');
-    setTimeout(() => {
-      qEl.innerHTML = `${item.lines[0]}<br />${item.lines[1]}`;
-      sEl.textContent = item.source;
-      qEl.classList.remove('is-glitching');
-    }, 140);
+    sEl.classList.remove('is-locked');
+    sEl.classList.add('is-scanning');
+
+    const startTime = performance.now();
+    const GLITCH_MS = 320;
+    const DECODE_MS = 680;
+    const TOTAL_MS = GLITCH_MS + DECODE_MS;
+    let lastFramePaint = 0;
+
+    const renderScrambledLines = (progress, isGlitchStage) => {
+      const lockCursor = isGlitchStage ? -4 : progress * (totalChars + 3);
+      let globalIdx = 0;
+      const rendered = allLines.map((tokens) => {
+        let out = '';
+        for (const tok of tokens) {
+          const idx = globalIdx++;
+          if (!isGlitchStage && idx < lockCursor - 3) {
+            const safe = escapeHtmlChar(tok.ch);
+            out += tok.gold ? `<span class="hl-gold">${safe}</span>` : safe;
+          } else if (!isGlitchStage && idx < lockCursor) {
+            out += `<span class="denpa-cipher-hot">${escapeHtmlChar(pickGlyph(tok.ch))}</span>`;
+          } else if (isGlitchStage) {
+            const hot = Math.random() > 0.62;
+            const cls = hot ? 'denpa-cipher-hot' : 'denpa-cipher-dim';
+            out += `<span class="${cls}">${escapeHtmlChar(pickGlyph(tok.ch))}</span>`;
+          } else {
+            out += `<span class="denpa-cipher-dim">${escapeHtmlChar(pickGlyph(tok.ch))}</span>`;
+          }
+        }
+        return out;
+      });
+      qEl.innerHTML = `${rendered[0]}<br />${rendered[1]}`;
+    };
+
+    const tick = (now) => {
+      const elapsed = now - startTime;
+      if (elapsed >= TOTAL_MS) {
+        qEl.innerHTML = `${item.lines[0]}<br />${item.lines[1]}`;
+        qEl.style.minHeight = '';
+        qEl.classList.remove('is-glitching', 'is-decoding');
+        qEl.classList.add('is-locked');
+
+        sEl.classList.remove('is-scanning');
+        sEl.classList.add('is-locked');
+        sEl.textContent = item.source;
+
+        btn.classList.remove('is-tuning');
+        if (btnLabel) btnLabel.textContent = '接收随机电波';
+
+        quoteCleanupTimers.push(
+          setTimeout(() => {
+            qEl.classList.remove('is-locked');
+            sEl.classList.remove('is-locked');
+          }, 460)
+        );
+        quoteRafId = null;
+        return;
+      }
+
+      // Update cipher glyphs at ~22fps for crisp CRT terminal cadence
+      if (now - lastFramePaint >= 44) {
+        lastFramePaint = now;
+        if (elapsed < GLITCH_MS) {
+          const sweepFreq = (7985 + Math.random() * 32).toFixed(2);
+          const db = -18 + Math.floor(Math.random() * 9);
+          sEl.textContent = `// SIGNAL DESYNC · SWEEPING ${sweepFreq} kHz [${db}dB]`;
+          renderScrambledLines(0, true);
+        } else {
+          if (qEl.classList.contains('is-glitching')) {
+            qEl.classList.remove('is-glitching');
+            qEl.classList.add('is-decoding');
+          }
+          const decodeProgress = (elapsed - GLITCH_MS) / DECODE_MS;
+          // Smooth ease-out curve so lock-on accelerates cleanly then snaps
+          const eased = 1 - Math.pow(1 - decodeProgress, 1.55);
+          const pct = String(Math.min(99, Math.floor(eased * 100))).padStart(2, '0');
+          const lockFreq = (8000 + (1 - eased) * (Math.random() * 6 - 3)).toFixed(2);
+          sEl.textContent = `// CARRIER LOCK · DECODING ${lockFreq} kHz [ ${pct}% ]`;
+          renderScrambledLines(eased, false);
+        }
+      }
+
+      quoteRafId = requestAnimationFrame(tick);
+    };
+
+    quoteRafId = requestAnimationFrame(tick);
   });
 }
 

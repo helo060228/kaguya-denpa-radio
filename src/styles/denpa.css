@@ -709,6 +709,7 @@ a.denpa-section-more:hover {
 }
 
 .denpa-interlude-quote {
+  position: relative;
   margin: 0 auto;
   max-width: 960px;
   font-family: var(--font-serif);
@@ -718,6 +719,27 @@ a.denpa-section-more:hover {
   letter-spacing: 0.08em;
   color: var(--text-primary);
   text-shadow: 0 2px 24px rgba(4, 6, 19, 0.92);
+  transition: text-shadow 0.25s ease, filter 0.25s ease, opacity 0.2s ease;
+}
+
+.denpa-interlude-quote::after {
+  content: '';
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 0;
+  height: 2px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(138, 211, 232, 0.72) 22%,
+    rgba(231, 200, 114, 0.95) 50%,
+    rgba(138, 211, 232, 0.72) 78%,
+    transparent 100%
+  );
+  box-shadow: 0 0 14px rgba(112, 184, 206, 0.75);
 }
 
 .denpa-interlude-quote .hl-gold {
@@ -726,9 +748,11 @@ a.denpa-section-more:hover {
 
 .denpa-interlude-source {
   margin-top: 22px;
+  min-height: 1.5em;
   font-size: 0.82rem;
   letter-spacing: 0.12em;
   color: var(--text-muted);
+  transition: color 0.25s ease, text-shadow 0.25s ease;
 }
 
 /* ==========================================================================
@@ -1869,11 +1893,159 @@ a.denpa-section-more:hover {
   background: rgba(212, 175, 76, 0.11);
 }
 
+.denpa-tune-btn.is-tuning {
+  border-color: var(--accent-cyan-bright);
+  color: var(--accent-cyan-bright);
+  background: rgba(112, 184, 206, 0.14);
+  box-shadow: 0 0 18px rgba(112, 184, 206, 0.30);
+}
+
+.denpa-tune-btn .denpa-tune-icon {
+  display: inline-block;
+}
+
+.denpa-tune-btn.is-tuning .denpa-tune-icon {
+  animation: denpa-spin 0.55s linear infinite;
+}
+
 .denpa-interlude-quote.is-glitching {
-  opacity: 0.45;
-  transform: translateX(2px);
-  text-shadow: 3px 0 0 rgba(219, 105, 130, 0.7), -3px 0 0 rgba(112, 184, 206, 0.7);
-  transition: opacity 0.12s ease, transform 0.12s ease;
+  animation: denpa-crt-glitch 0.28s steps(2, end) infinite;
+}
+
+.denpa-interlude-quote.is-glitching::after {
+  animation: denpa-scan-sweep 0.32s linear infinite;
+}
+
+.denpa-interlude-quote.is-decoding {
+  animation: denpa-crt-decode-flicker 0.18s steps(2, end) infinite;
+}
+
+.denpa-interlude-quote.is-decoding::after {
+  animation: denpa-scan-sweep 0.55s ease-in-out infinite;
+}
+
+.denpa-interlude-quote.is-locked {
+  animation: denpa-signal-lock 0.42s ease-out forwards;
+}
+
+.denpa-cipher-hot {
+  color: var(--accent-cyan-bright);
+  text-shadow:
+    0 0 12px rgba(138, 211, 232, 0.90),
+    2px 0 0 rgba(219, 105, 130, 0.65),
+   -2px 0 0 rgba(112, 184, 206, 0.85);
+}
+
+.denpa-cipher-dim {
+  color: rgba(138, 166, 212, 0.46);
+  text-shadow:
+    2px 0 0 rgba(219, 105, 130, 0.35),
+   -2px 0 0 rgba(112, 184, 206, 0.45);
+}
+
+.denpa-interlude-source.is-scanning {
+  font-family: var(--font-mono);
+  color: var(--accent-cyan-bright);
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 12px rgba(112, 184, 206, 0.58);
+  animation: denpa-telemetry-blink 0.22s steps(2, end) infinite;
+}
+
+.denpa-interlude-source.is-locked {
+  color: var(--accent-gold-bright);
+  text-shadow: 0 0 14px rgba(231, 200, 114, 0.50);
+}
+
+@keyframes denpa-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes denpa-scan-sweep {
+  0%   { top: -6%; opacity: 0; }
+  15%  { opacity: 0.95; }
+  85%  { opacity: 0.85; }
+  100% { top: 106%; opacity: 0; }
+}
+
+@keyframes denpa-crt-glitch {
+  0% {
+    opacity: 0.92;
+    transform: translate3d(-3px, 0, 0) skewX(-1.4deg);
+    text-shadow: 5px 0 0 rgba(219, 105, 130, 0.85), -5px 0 0 rgba(112, 184, 206, 0.85), 0 0 18px rgba(112, 184, 206, 0.45);
+    filter: brightness(1.18);
+  }
+  25% {
+    opacity: 0.28;
+    transform: translate3d(4px, -1px, 0) skewX(1.8deg);
+    text-shadow: -6px 0 0 rgba(219, 105, 130, 0.90), 6px 0 0 rgba(112, 184, 206, 0.90);
+    filter: blur(0.8px) brightness(1.35);
+  }
+  50% {
+    opacity: 0.84;
+    transform: translate3d(-2px, 1px, 0) skewX(-0.8deg);
+    text-shadow: 4px 1px 0 rgba(219, 105, 130, 0.80), -4px -1px 0 rgba(138, 211, 232, 0.90), 0 0 22px rgba(231, 200, 114, 0.40);
+    filter: brightness(1.1);
+  }
+  75% {
+    opacity: 0.36;
+    transform: translate3d(3px, 0, 0) skewX(1.2deg);
+    text-shadow: 5px 0 0 rgba(112, 184, 206, 0.92), -5px 0 0 rgba(219, 105, 130, 0.82);
+    filter: blur(0.5px);
+  }
+  100% {
+    opacity: 0.78;
+    transform: translate3d(0, 0, 0);
+    text-shadow: 3px 0 0 rgba(219, 105, 130, 0.75), -3px 0 0 rgba(112, 184, 206, 0.75);
+    filter: none;
+  }
+}
+
+@keyframes denpa-crt-decode-flicker {
+  0% {
+    opacity: 0.96;
+    transform: translate3d(-1px, 0, 0);
+    text-shadow: 2.5px 0 0 rgba(219, 105, 130, 0.58), -2.5px 0 0 rgba(112, 184, 206, 0.70), 0 0 18px rgba(112, 184, 206, 0.30);
+  }
+  50% {
+    opacity: 0.72;
+    transform: translate3d(1.5px, 0, 0);
+    text-shadow: -3px 0 0 rgba(219, 105, 130, 0.65), 3px 0 0 rgba(138, 211, 232, 0.78), 0 0 22px rgba(231, 200, 114, 0.25);
+  }
+  100% {
+    opacity: 0.94;
+    transform: translate3d(0, 0, 0);
+    text-shadow: 2px 0 0 rgba(219, 105, 130, 0.45), -2px 0 0 rgba(112, 184, 206, 0.60);
+  }
+}
+
+@keyframes denpa-signal-lock {
+  0% {
+    opacity: 0.86;
+    filter: brightness(1.38);
+    text-shadow:
+      0 0 26px rgba(138, 211, 232, 0.85),
+      0 0 42px rgba(231, 200, 114, 0.55),
+      2px 0 0 rgba(219, 105, 130, 0.45),
+     -2px 0 0 rgba(112, 184, 206, 0.55);
+  }
+  38% {
+    opacity: 1;
+    filter: brightness(1.16);
+    text-shadow:
+      0 0 22px rgba(231, 200, 114, 0.55),
+      0 2px 24px rgba(4, 6, 19, 0.92);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+    text-shadow: 0 2px 24px rgba(4, 6, 19, 0.92);
+  }
+}
+
+@keyframes denpa-telemetry-blink {
+  0%, 100% { opacity: 0.95; }
+  50%      { opacity: 0.52; }
 }
 
 /* ==========================================================================
@@ -2553,7 +2725,12 @@ a.denpa-section-more:hover {
 @media (prefers-reduced-motion: reduce) {
   .denpa-marquee-track,
   .denpa-audio-btn[aria-pressed="true"] .denpa-eq i,
-  .denpa-scroll-cue i {
+  .denpa-scroll-cue i,
+  .denpa-tune-btn.is-tuning .denpa-tune-icon,
+  .denpa-interlude-quote.is-glitching,
+  .denpa-interlude-quote.is-decoding,
+  .denpa-interlude-quote.is-locked,
+  .denpa-interlude-source.is-scanning {
     animation: none;
   }
   .denpa-card,
