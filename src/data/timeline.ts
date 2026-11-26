@@ -59,7 +59,7 @@ export const TIMELINE_EPOCHS: TimelineEpoch[] = [
     title: '散发七彩微光的电线杆',
     location: '东京都住宅巷口',
     accent: 'var(--route-1)',
-    spoiler: false,
+    spoiler: true,
     summary: '疲惫归家的酒寄彩叶在发光的电线杆下捡到神秘婴儿，少女迅速成长并被命名为「辉夜」。',
     detail: '古老的竹取传说在霓虹与电流的间隙重启。窄小的单身公寓从此响起吵闹的笑声、MIDI 键盘和永不熄灭的夜灯。',
     link: {
@@ -74,7 +74,7 @@ export const TIMELINE_EPOCHS: TimelineEpoch[] = [
     title: '彩P出道与拒绝告别的满月',
     location: '月读舞台 → 近地轨道',
     accent: 'var(--route-4)',
-    spoiler: false,
+    spoiler: true,
     summary: '两人在月读搭档直播走红；月圆之夜月球使者降临，彩叶隔空传去的歌声击穿了冰冷轨道。',
     detail: '听到那首写给自己的歌后，辉夜拒绝了既定的悲伤剧本，毅然转过飞船航向冲回地球——因果的圆环在此无缝闭合，重新连回 EPOCH 01。',
     link: {
